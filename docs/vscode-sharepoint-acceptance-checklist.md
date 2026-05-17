@@ -52,17 +52,19 @@
 
 此 Stage 在開發者個人電腦執行，不需 SharePoint Server。
 
-本 Stage 只列出 **隨個別環境變動才會發生** 的驗證項目；隨 git 同步必然成立的事實（如資料夾存在、`tasks.json` 內容、腳本語法）不重複驗證。
+本 Stage 只列出 **隨個別環境變動才會發生** 的驗證項目；以下兩類事實不重複驗證：
+
+1. **git 同步後天然成立**：資料夾存在、`tasks.json` 內容、腳本語法、`settings.json` 內容。
+2. **Windows 預設安裝就有**：Windows PowerShell 5.1（內建於 Windows 10 / 11 / Server）、`cmd.exe`、`PowerShell ISE`。
 
 | # | 驗證項目 | 執行步驟 | 預期結果 | 勾選 |
 |---|----------|----------|----------|------|
 | A1 | VS Code 已安裝 | terminal 執行 `code --version` | 顯示版本號 | `[x ]` |
 | A2 | `ms-dotnettools.csharp` 已安裝 | VS Code Extensions 搜尋 `C#`，確認發佈者為 Microsoft | 顯示 Installed | `[x ]` |
 | A3 | C# Dev Kit 未接管 | Extensions 確認 C# Dev Kit 未安裝，或已在本 workspace `Disable (Workspace)` | 不在 Enabled 清單 | `[x ]` |
-| A4 | Windows PowerShell 5.1 可用 | `powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"` | Major=5、Minor=1 | `[x ]` |
-| A5 | VS Code 能正確載入 tasks.json | `Ctrl+Shift+P` → `Tasks: Run Task` | 看到 10 個 `SharePoint: *` task；無 schema 錯誤提示 | `[ ]` |
+| A4 | VS Code 能正確載入 tasks.json | `Ctrl+Shift+P` → `Tasks: Run Task` | 看到 10 個 `SharePoint: *` task；無 schema 錯誤提示 | `[x ]` |
 
-**Stage 1 通過條件：** A1～A5 全部 `[x]`。
+**Stage 1 通過條件：** A1～A4 全部 `[x]`。
 
 ---
 
@@ -179,7 +181,7 @@ C4 / C5 失敗，**不可** 進入 Stage 5；可先做 Stage 4 的 build / packa
 | Stage / 項目 | 常見症狀 | 對應參考 |
 |--------------|----------|----------|
 | A2、A3、B2、B3 | IntelliSense 不出、無法跳轉 | `vscode-sharepoint-dotnet-framework-feasibility.md` §「建議 VS Code workspace 設定」 |
-| A4、C4、C5 | PowerShell snap-in 找不到 | `vscode-sharepoint-poc-runbook.md` §3 |
+| C4、C5 | PowerShell snap-in 找不到 | `vscode-sharepoint-poc-runbook.md` §3 |
 | C1、C2、C9、D1 | MSBuild 找不到 / SharePoint targets 缺失 | `vscode-sharepoint-poc-runbook.md` §2 |
 | C6、C7、C8 | 部署權限 / Execution Policy / ConstrainedLanguage | `vscode-sharepoint-poc-runbook.md` §3.4、§3.5 |
 | D5 | Validate Package 報錯 | `vscode-sharepoint-poc-runbook.md` §6（reference assemblies / SharePoint targets 列） |
@@ -192,7 +194,7 @@ C4 / C5 失敗，**不可** 進入 Stage 5；可先做 Stage 4 的 build / packa
 
 當以下條件全數成立時，本驗收完成：
 
-- [ ] Stage 1 通過（A1～A5 全 `[x]`）。
+- [ ] Stage 1 通過（A1～A4 全 `[x]`）。
 - [ ] Stage 2 通過（B1～B8 全 `[x]`）。
 - [ ] Stage 3 通過（C1～C9 全 `[x]`）。
 - [ ] Stage 4 通過（D1～D5 全 `[x]`，D6 已紀錄結果）。

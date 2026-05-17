@@ -70,7 +70,7 @@ flowchart TD
 
 ### 5. [`vscode-sharepoint-acceptance-checklist.md`](./vscode-sharepoint-acceptance-checklist.md) — 使用者驗收清單
 
-- 內容：6 個 Stage × 共 43 項可勾選驗證點、驗收紀錄表、失敗對策索引、最終驗收聲明（含簽署欄）。
+- 內容：6 個 Stage × 共 42 項可勾選驗證點、驗收紀錄表、失敗對策索引、最終驗收聲明（含簽署欄）。
 - 與 runbook 區隔：runbook 教 **怎麼操作**、checklist 驗 **能不能取代 VS**。
 - 何時讀：實測完畢、要做驗收簽署，或要回答「VS Code 真的可以取代 VS 嗎」時。
 
