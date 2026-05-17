@@ -1,6 +1,6 @@
 # `docs/` 文檔索引
 
-本目錄記錄「以藍色 Visual Studio Code 取代紫色 Visual Studio 開發 SharePoint Server / `.NET Framework` 專案」這個假設的決策、流程、操作與驗收，按生命週期分成 5 份文件。
+本目錄記錄「以藍色 Visual Studio Code 取代紫色 Visual Studio 開發 SharePoint Server / `.NET Framework` 專案」這個假設的決策、流程、操作與驗收，按生命週期分成 5 份主文件，並另附 1 份元件參考文件。
 
 ## 文件總覽
 
@@ -11,6 +11,7 @@
 | 3 | [`vscode-sharepoint-workflow-dependency-order.md`](./vscode-sharepoint-workflow-dependency-order.md) | **工作流依賴順序與交接任務表** | 從決策到實測的順序是什麼？目前進度卡在哪？下一步是誰做什麼？ | 開發者、PM、接手者 |
 | 4 | [`vscode-sharepoint-poc-runbook.md`](./vscode-sharepoint-poc-runbook.md) | **公司電腦 PoC 操作手冊**（教 **怎麼操作**） | 公司電腦怎麼準備環境？第一次 build/package/deploy 怎麼跑？失敗怎麼排查？ | 在公司電腦執行 PoC 的工程師 |
 | 5 | [`vscode-sharepoint-acceptance-checklist.md`](./vscode-sharepoint-acceptance-checklist.md) | **使用者驗收清單**（驗 **能不能取代 VS**） | VS Code 真的能取代 Visual Studio 嗎？6 個 Stage 是否全數通過？ | 驗收人、QA、第二驗收人 |
+| 附 | [`omnisharp-server-reference.md`](./omnisharp-server-reference.md) | **OmniSharp Server 元件參考** | OmniSharp 是什麼？為什麼要用 legacy mode？壞掉時要從哪裡看？ | 排查 IntelliSense 問題者、想理解設定原理者 |
 
 ## 閱讀建議
 
@@ -23,6 +24,7 @@
 | 要做驗收 / 簽署結論 | 5（從 Stage 1 開始逐項打勾），需要時翻 4 對照操作 |
 | 接手前一個人的進度 | 3（看交接任務表狀態） → 對應的 4 或 5 |
 | 評估是否值得繼續推進 | 1 → 2 → 3 §「依賴順序總覽」 |
+| 排查 OmniSharp / IntelliSense 問題 | 附（`omnisharp-server-reference.md`） |
 
 ## 文件關聯圖
 
@@ -73,6 +75,12 @@ flowchart TD
 - 內容：6 個 Stage × 共 42 項可勾選驗證點、驗收紀錄表、失敗對策索引、最終驗收聲明（含簽署欄）。
 - 與 runbook 區隔：runbook 教 **怎麼操作**、checklist 驗 **能不能取代 VS**。
 - 何時讀：實測完畢、要做驗收簽署，或要回答「VS Code 真的可以取代 VS 嗎」時。
+
+### 附. [`omnisharp-server-reference.md`](./omnisharp-server-reference.md) — OmniSharp Server 元件參考
+
+- 內容：OmniSharp 是什麼、與 C# Dev Kit 的差異、本專案 `settings.json` 每個鍵的意義、啟動驗證、Log 解讀、常見排查、與 MSBuild/Roslyn 的關係圖。
+- 與主線文件區隔：主線文件提到 OmniSharp 時只給結論（用 legacy mode），本文件回答 **為什麼**、**怎麼確認**、**壞了從哪裡看**。
+- 何時讀：A2/A3/B1～B7 驗收項目卡關、想理解 `useModernNet: false` 為什麼這樣設、想看 OmniSharp Log 訊息對照表時。
 
 ## 相關 repo 路徑
 
