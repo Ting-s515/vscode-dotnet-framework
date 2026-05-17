@@ -14,6 +14,7 @@
 4. 不需要 WinForms、WPF、Razor 或其他視覺化 Designer。
 5. 本機不驗證 SharePoint runtime，SharePoint 相關驗證移到公司電腦執行。
 6. 優先建立命令列與 VS Code tasks 流程，不優先開發 VS Code extension。
+7. 不預設公司電腦已具備 SharePoint PowerShell；安裝或確認 SharePoint PowerShell 可用是公司端前置步驟。
 
 ## 依賴順序總覽
 
@@ -24,12 +25,13 @@ flowchart TD
     C --> D[建立 VS Code tasks]
     D --> E[撰寫操作文件]
     E --> F[帶到公司電腦設定環境]
-    F --> G[使用真實 SharePoint 專案 PoC]
-    G --> H{PoC 是否穩定}
-    H -->|是| I[整理共用模板]
-    H -->|否| J[修正 scripts 與 tasks]
-    J --> G
-    I --> K[評估是否開發 VS Code extension]
+    F --> G[安裝或確認 SharePoint PowerShell]
+    G --> H[使用真實 SharePoint 專案 PoC]
+    H --> I{PoC 是否穩定}
+    I -->|是| J[整理共用模板]
+    I -->|否| K[修正 scripts 與 tasks]
+    K --> H
+    J --> L[評估是否開發 VS Code extension]
 ```
 
 ## 步驟 1：確認目標工作流
@@ -136,31 +138,45 @@ scripts/
 2. VS Code extension 建議。
 3. `.NET Framework Developer Pack` 版本對應方式。
 4. `MSBuild.exe` 尋找方式。
-5. SharePoint Management Shell 執行前提。
+5. SharePoint PowerShell / SharePoint Management Shell 安裝或啟用步驟。
 6. 部署帳號權限前提。
 7. 第一次 PoC 的執行順序。
 8. 常見失敗點與排查方向。
 
 此步驟完成後，才適合切到公司電腦進行驗證。
 
-## 步驟 6：公司電腦環境設定
+## 步驟 6：公司電腦基礎環境設定
 
 執行位置：公司電腦或可連到 SharePoint Server 的環境。
 
-目的：確認公司電腦具備實際建置、打包、部署 SharePoint solution 的條件。
+目的：確認公司電腦具備實際建置與打包 SharePoint solution 的條件。SharePoint PowerShell 不在此步驟假設已存在，需於下一步明確安裝或確認。
 
 需確認：
 
 1. `MSBuild.exe` 可用。
 2. 目標 `.NET Framework Developer Pack` 已安裝。
 3. SharePoint project targets / assemblies 可被找到。
-4. SharePoint Management Shell 可用。
-5. 執行者具有部署 solution 的權限。
-6. 真實專案可在不開 Visual Studio 的情況下被命令列建置。
+4. 真實專案可在不開 Visual Studio 的情況下被命令列建置。
+
+此步驟完成後，才能進入 SharePoint PowerShell 前置設定。
+
+## 步驟 7：安裝或確認 SharePoint PowerShell
+
+執行位置：公司電腦或可連到 SharePoint Server 的環境。
+
+目的：把 SharePoint solution 部署能力當成明確前置依賴，而不是隱含假設。
+
+需確認：
+
+1. SharePoint PowerShell / SharePoint Management Shell 已安裝或可啟用。
+2. PowerShell 可以載入 SharePoint 管理指令所需 module、snap-in 或管理工具。
+3. 可執行 solution 部署相關 cmdlet，例如 `Add-SPSolution`、`Install-SPSolution`、`Update-SPSolution`、`Uninstall-SPSolution`、`Remove-SPSolution`。
+4. 執行者具有部署 solution 的權限。
+5. PowerShell execution policy 不會阻擋專案 scripts 執行。
 
 此步驟完成後，才能進入真實專案 PoC。
 
-## 步驟 7：真實 SharePoint 專案 PoC
+## 步驟 8：真實 SharePoint 專案 PoC
 
 執行位置：公司電腦或可連到 SharePoint Server 的環境。
 
@@ -182,7 +198,7 @@ scripts/
 3. 不開紫色 Visual Studio 也能部署或更新 solution。
 4. 部署結果可在 SharePoint Server 上被確認。
 
-## 步驟 8：修正與模板化
+## 步驟 9：修正與模板化
 
 執行位置：本機與公司電腦都可能需要。
 
@@ -198,7 +214,7 @@ scripts/
 
 此步驟需反覆執行，直到流程穩定。
 
-## 步驟 9：評估 VS Code extension
+## 步驟 10：評估 VS Code extension
 
 執行位置：本機。
 
@@ -225,6 +241,7 @@ extension 不應做的事：
 1. 建立 scripts 模板。
 2. 建立 VS Code tasks 模板。
 3. 撰寫公司電腦 PoC 操作文件。
+4. 在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。
 
 暫不執行：
 
