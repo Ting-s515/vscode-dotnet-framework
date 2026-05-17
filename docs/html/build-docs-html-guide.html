@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>背景</title>
+  <title>`docs/*.md` 轉 HTML 操作手冊</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
   <style>
@@ -108,8 +108,8 @@
       <h2>docs/</h2>
       <ul>
                 <li><a href="README.html">README</a></li>
-        <li><a href="build-docs-html-guide.html">build-docs-html-guide</a></li>
-        <li class="active"><a href="#">framework</a></li>
+        <li class="active"><a href="#">build-docs-html-guide</a></li>
+        <li><a href="framework.html">framework</a></li>
         <li><a href="omnisharp-server-reference.html">omnisharp-server-reference</a></li>
         <li><a href="vscode-sharepoint-acceptance-checklist.html">vscode-sharepoint-acceptance-checklist</a></li>
         <li><a href="vscode-sharepoint-dotnet-framework-feasibility.html">vscode-sharepoint-dotnet-framework-feasibility</a></li>
@@ -122,24 +122,102 @@
     </nav>
     <main>
       <article class="markdown-body">
-        <h1 id="%E8%83%8C%E6%99%AF" tabindex="-1">背景</h1>
-<ol>
-<li>IDE 有區分紫色的 Visual Studio 和藍色的 Visual Studio Code，兩者都是 Microsoft 的產品，但它們是不同的開發工具。</li>
-<li>紫色的 Visual Studio 是微軟專門開發 .net framework 的 IDE</li>
-<li>但紫色的 Visual Studio 沒支援跨平台，加上 IDE 的體積龐大，我超級討厭</li>
-<li>平常我只使用藍色的 Visual Studio Code，輕量、跨平台，可透過安裝套件來支援不同的程式語言和框架</li>
-<li>主要是用於公司專案windows server 的 sharepoint 桌面開發，能夠支援部署、打包等功能</li>
-<li>不需要支援WinForms / WPF / razor等</li>
-</ol>
-<h1 id="%E5%95%8F%E9%A1%8C" tabindex="-1">問題</h1>
-<ol>
-<li>目前市場套件是否有可讓 Visual Studio Code 支援 .net framework 的套件？</li>
-<li>如果有，是否能提供一些推薦的套件名稱和使用方法？</li>
-<li>如果沒有，是否有其他替代方案可以讓我在 Visual Studio Code 中開發 .net framework 的應用程式？或是自己開發一個套件來支援 .net framework？</li>
-</ol>
+        <h1 id="docs-md-%E8%BD%89-html-%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8A" tabindex="-1"><code>docs/*.md</code> 轉 HTML 操作手冊</h1>
+<p>把 <code>docs/</code> 下所有 <code>.md</code> 轉成 <code>docs/html/*.html</code>，方便用瀏覽器閱讀（側邊導覽、Mermaid 圖渲染、語法高亮）。</p>
+<h2 id="1-prerequisites" tabindex="-1">1. Prerequisites</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>版本</th>
+<th>驗證指令</th>
+<th>取得方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>18+</td>
+<td><code>node --version</code></td>
+<td><a href="https://nodejs.org/">https://nodejs.org/</a>（LTS）</td>
+</tr>
+<tr>
+<td>PowerShell</td>
+<td>5.1+</td>
+<td><code>$PSVersionTable.PSVersion</code></td>
+<td>Windows 10/11 內建</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>不需要全域 npm 套件，腳本第一次執行會在 <code>scripts/build-docs-html/</code> 內自動 <code>npm install</code>。</p>
+</blockquote>
+<h2 id="2-%E4%B8%89%E5%80%8B%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4" tabindex="-1">2. 三個常用指令</h2>
+<p>在 <strong>repo 根目錄</strong> 開 PowerShell 執行：</p>
+<pre><code class="language-powershell"># (1) 第一次執行（會自動 npm install，約 5 秒）
+.\scripts\build-docs-html.ps1
+
+# (2) 之後改了 docs/*.md，重新產生（跳過 npm install，約 1 秒）
+.\scripts\build-docs-html.ps1 -SkipInstall
+
+# (3) 看完整參數說明
+Get-Help .\scripts\build-docs-html.ps1 -Full
+</code></pre>
+<p>執行完成後：</p>
+<pre><code class="language-powershell"># 用預設瀏覽器開啟首頁（自動跳轉到 README.html）
+start .\docs\html\index.html
+</code></pre>
+<h2 id="3-troubleshoot-%E9%80%9F%E6%9F%A5" tabindex="-1">3. Troubleshoot 速查</h2>
+<table>
+<thead>
+<tr>
+<th>症狀</th>
+<th>原因</th>
+<th>處理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>找不到 node.exe</code></td>
+<td>沒裝 Node.js</td>
+<td>安裝 Node.js LTS 後重開 PowerShell 再試</td>
+</tr>
+<tr>
+<td><code>npm install</code> 卡住或超時</td>
+<td>公司 proxy / npm registry 被擋</td>
+<td>改設 npm registry：<code>npm config set registry https://registry.npmmirror.com/</code> 後重跑</td>
+</tr>
+<tr>
+<td>HTML 開啟後 Mermaid 沒渲染、字型很醜</td>
+<td>公司網路擋 jsdelivr CDN</td>
+<td>暫時無解，需換成本地資源（後續可改 <code>scripts/build-docs-html/template.html</code>）</td>
+</tr>
+<tr>
+<td>改了 <code>.md</code> 但 HTML 沒變</td>
+<td>沒重跑腳本</td>
+<td>執行 <code>.\scripts\build-docs-html.ps1 -SkipInstall</code></td>
+</tr>
+<tr>
+<td>內部連結點下去 404</td>
+<td>對應 <code>.md</code> 沒被一起 build（如手動寫的 <code>./xxx.html</code> 連到不存在檔案）</td>
+<td>確認原 <code>.md</code> 的連結是 <code>./xxx.md</code>，腳本會自動改寫為 <code>.html</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B" tabindex="-1">4. 工具檔案結構</h2>
+<pre><code class="language-text">scripts/
+├── build-docs-html.ps1            # PowerShell 入口（使用者只接觸這個）
+└── build-docs-html/
+    ├── package.json               # npm 套件定義（markdown-it、markdown-it-anchor）
+    ├── package-lock.json          # 鎖版本，commit 進 repo
+    ├── build.mjs                  # 實際的 Node 轉換邏輯
+    ├── template.html              # HTML 模板（改排版/CDN 來源就改這裡）
+    └── node_modules/              # 自動安裝，.gitignore 已排除
+</code></pre>
+<p>要客製排版（顏色、字型、側邊欄寬度）→ 改 <code>template.html</code> 內的 <code>&lt;style&gt;</code>；要改連結改寫規則或 Mermaid 處理 → 改 <code>build.mjs</code>。</p>
 
         <div class="doc-footer">
-          原始檔：<code>docs/framework.md</code> · 產生時間：2026-05-17 09:52:41 UTC
+          原始檔：<code>docs/build-docs-html-guide.md</code> · 產生時間：2026-05-17 09:52:41 UTC
         </div>
       </article>
     </main>

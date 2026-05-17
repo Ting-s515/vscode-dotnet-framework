@@ -14,6 +14,7 @@
 | 4 | [`vscode-sharepoint-poc-runbook.md`](./vscode-sharepoint-poc-runbook.md) | **公司電腦 PoC 操作手冊**（教 **怎麼操作**） | 公司電腦怎麼準備環境？第一次 build/package/deploy 怎麼跑？失敗怎麼排查？ | 在公司電腦執行 PoC 的工程師 |
 | 5 | [`vscode-sharepoint-acceptance-checklist.md`](./vscode-sharepoint-acceptance-checklist.md) | **使用者驗收清單**（驗 **能不能取代 VS**） | VS Code 真的能取代 Visual Studio 嗎？6 個 Stage 是否全數通過？ | 驗收人、QA、第二驗收人 |
 | 附 | [`omnisharp-server-reference.md`](./omnisharp-server-reference.md) | **OmniSharp Server 元件參考** | OmniSharp 是什麼？為什麼要用 legacy mode？壞掉時要從哪裡看？ | 排查 IntelliSense 問題者、想理解設定原理者 |
+| 附 | [`build-docs-html-guide.md`](./build-docs-html-guide.md) | **HTML 預覽建構手冊** | 怎麼把 `docs/*.md` 轉成 HTML？網路擋 CDN 怎麼辦？要客製排版改哪裡？ | 任何想用瀏覽器閱讀文件或維護轉換工具的人 |
 
 ## 閱讀建議
 
