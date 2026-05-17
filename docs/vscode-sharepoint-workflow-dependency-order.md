@@ -245,33 +245,94 @@ extension 不應做的事：
 
 ## 明確執行清單
 
-1. 先建立 `scripts/` 模板。
-   - `build.ps1`
-   - `package.ps1`
-   - `validate-package.ps1`
-   - `deploy-wsp.ps1`
-   - `update-wsp.ps1`
-   - `retract-wsp.ps1`
+狀態定義：
 
-2. 再建立 `.vscode/tasks.json`。
-   - `SharePoint: Build`
-   - `SharePoint: Package WSP`
-   - `SharePoint: Validate Package`
-   - `SharePoint: Deploy WSP`
-   - `SharePoint: Update WSP`
-   - `SharePoint: Retract WSP`
+- `[x]` 已完成，可供後續工具直接使用。
+- `[ ]` 尚未完成，是下一個可執行工作。
+- `[blocked]` 需等待公司電腦或 SharePoint Server 環境。
 
-3. 補一份公司電腦 PoC 操作文件。
-   - 安裝或確認 SharePoint PowerShell / SharePoint Management Shell。
-   - 確認 `MSBuild.exe`。
-   - 確認 `.NET Framework Developer Pack`。
-   - 修改腳本參數。
-   - 用真實專案執行 build / package / deploy。
+### 交接任務表
 
-4. 等到公司電腦或 SharePoint Server 環境再實測。
-   - 不開紫色 Visual Studio 能 build。
-   - 能產生 `.wsp`。
-   - 能透過 PowerShell deploy / update / retract。
+| 順序 | 狀態 | 任務 | 輸出 | 接手說明 |
+| --- | --- | --- | --- | --- |
+| 1 | `[x]` | 建立 `scripts/` 模板 | `scripts/*.ps1` | 已完成六個 PowerShell 腳本模板，後續可直接被 `.vscode/tasks.json` 呼叫。 |
+| 2 | `[ ]` | 建立 `.vscode/tasks.json` | `.vscode/tasks.json` | 下一步應建立 VS Code tasks，將每個 task 對應到既有 `scripts/*.ps1`。 |
+| 3 | `[ ]` | 補公司電腦 PoC 操作文件 | `docs/` 下新增 PoC 文件 | 需寫清楚公司電腦前置安裝、參數修改與第一次 PoC 執行順序。 |
+| 4 | `[blocked]` | 到公司電腦或 SharePoint Server 環境實測 | PoC 結果與修正紀錄 | 本機不執行 SharePoint 實測，需等公司環境具備 SharePoint PowerShell、MSBuild 與真實專案。 |
+
+### 1. `[x]` 先建立 `scripts/` 模板
+
+完成檔案：
+
+- [x] `scripts/build.ps1`
+- [x] `scripts/package.ps1`
+- [x] `scripts/validate-package.ps1`
+- [x] `scripts/deploy-wsp.ps1`
+- [x] `scripts/update-wsp.ps1`
+- [x] `scripts/retract-wsp.ps1`
+
+完成標準：
+
+- [x] 六個腳本檔案已建立。
+- [x] 腳本採參數化設計，不硬編碼公司電腦路徑。
+- [x] build / package / validate 由 MSBuild 負責。
+- [x] deploy / update / retract 由 SharePoint PowerShell 負責。
+- [x] SharePoint PowerShell 不存在時會回報明確錯誤。
+- [x] 已用 PowerShell parser 做語法檢查。
+
+後續依賴：
+
+- `.vscode/tasks.json` 應直接呼叫這六個腳本，不應重新實作 build 或部署邏輯。
+
+### 2. `[ ]` 再建立 `.vscode/tasks.json`
+
+待建立 tasks：
+
+- [ ] `SharePoint: Build`
+- [ ] `SharePoint: Package WSP`
+- [ ] `SharePoint: Validate Package`
+- [ ] `SharePoint: Deploy WSP`
+- [ ] `SharePoint: Update WSP`
+- [ ] `SharePoint: Retract WSP`
+
+完成標準：
+
+- [ ] 每個 task 都呼叫對應的 `scripts/*.ps1`。
+- [ ] task 參數使用 `${workspaceFolder}` 或可替換變數，不硬編碼公司路徑。
+- [ ] build / package / validate task 可在本機檢查參數結構，但不要求本機具備 SharePoint。
+- [ ] deploy / update / retract task 明確標示需在公司電腦或 SharePoint 環境執行。
+
+### 3. `[ ]` 補一份公司電腦 PoC 操作文件
+
+待記錄內容：
+
+- [ ] 安裝或確認 SharePoint PowerShell / SharePoint Management Shell。
+- [ ] 確認 `MSBuild.exe`。
+- [ ] 確認 `.NET Framework Developer Pack`。
+- [ ] 修改腳本參數。
+- [ ] 用真實專案執行 build / package / deploy。
+
+完成標準：
+
+- [ ] 文件可讓公司電腦使用者按順序完成前置檢查。
+- [ ] 文件列出第一次 PoC 的建議命令。
+- [ ] 文件列出常見失敗點與排查方向。
+- [ ] 文件明確說明本機不做 SharePoint 實測。
+
+### 4. `[blocked]` 等到公司電腦或 SharePoint Server 環境再實測
+
+等待原因：
+
+- 本機沒有 Windows Server / SharePoint Server 環境。
+- 本機不應假設 SharePoint PowerShell 已存在。
+- 真實 build / package / deploy 需要公司專案與公司 SharePoint 環境。
+
+成功標準：
+
+- [ ] 不開紫色 Visual Studio 能 build。
+- [ ] 能產生 `.wsp`。
+- [ ] 能透過 PowerShell deploy / update / retract。
+- [ ] 部署結果可在 SharePoint Server 上被確認。
 
 暫不執行：
 
