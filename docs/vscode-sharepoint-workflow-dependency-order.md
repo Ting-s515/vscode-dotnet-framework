@@ -243,6 +243,36 @@ extension 不應做的事：
 3. 撰寫公司電腦 PoC 操作文件。
 4. 在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。
 
+## 明確執行清單
+
+1. 先建立 `scripts/` 模板。
+   - `build.ps1`
+   - `package.ps1`
+   - `validate-package.ps1`
+   - `deploy-wsp.ps1`
+   - `update-wsp.ps1`
+   - `retract-wsp.ps1`
+
+2. 再建立 `.vscode/tasks.json`。
+   - `SharePoint: Build`
+   - `SharePoint: Package WSP`
+   - `SharePoint: Validate Package`
+   - `SharePoint: Deploy WSP`
+   - `SharePoint: Update WSP`
+   - `SharePoint: Retract WSP`
+
+3. 補一份公司電腦 PoC 操作文件。
+   - 安裝或確認 SharePoint PowerShell / SharePoint Management Shell。
+   - 確認 `MSBuild.exe`。
+   - 確認 `.NET Framework Developer Pack`。
+   - 修改腳本參數。
+   - 用真實專案執行 build / package / deploy。
+
+4. 等到公司電腦或 SharePoint Server 環境再實測。
+   - 不開紫色 Visual Studio 能 build。
+   - 能產生 `.wsp`。
+   - 能透過 PowerShell deploy / update / retract。
+
 暫不執行：
 
 1. 本機 SharePoint 環境檢查。
