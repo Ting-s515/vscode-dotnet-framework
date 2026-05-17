@@ -245,6 +245,8 @@ extension 不應做的事：
 
 剩餘任務 4 為 `[blocked]`，需到公司電腦或可連到 SharePoint Server 的環境執行實測，本機無法繼續推進。
 
+到公司電腦執行 PoC 時，請使用 [`vscode-sharepoint-acceptance-checklist.md`](./vscode-sharepoint-acceptance-checklist.md) 逐項打勾驗收，該文件設計為 UAT 清單，最終目標是回答「藍色 VS Code 能否取代紫色 Visual Studio 開發 SharePoint」。
+
 ## 明確執行清單
 
 狀態定義：
