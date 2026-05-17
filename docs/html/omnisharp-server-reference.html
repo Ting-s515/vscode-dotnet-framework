@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniSharp Server 參考文件</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    nav.sidebar {
+      background: #fff;
+      border-right: 1px solid #d1d9e0;
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav.sidebar h2 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #59636e;
+      margin: 0 0 12px;
+      padding: 0 10px;
+    }
+    nav.sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+    nav.sidebar li {
+      margin: 2px 0;
+    }
+    nav.sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #1f2328;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    nav.sidebar a:hover {
+      background: #eaeef2;
+    }
+    nav.sidebar li.active > a {
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 600;
+    }
+    main {
+      padding: 32px 48px;
+      background: #fff;
+      min-width: 0;
+    }
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 100%;
+    }
+    .markdown-body pre.mermaid {
+      background: #f6f8fa;
+      padding: 16px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .markdown-body pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      main { padding: 16px; }
+    }
+    .doc-footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #d1d9e0;
+      font-size: 12px;
+      color: #59636e;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <h2>docs/</h2>
+      <ul>
+                <li><a href="README.html">README</a></li>
+        <li><a href="framework.html">framework</a></li>
+        <li class="active"><a href="#">omnisharp-server-reference</a></li>
+        <li><a href="vscode-sharepoint-acceptance-checklist.html">vscode-sharepoint-acceptance-checklist</a></li>
+        <li><a href="vscode-sharepoint-dotnet-framework-feasibility.html">vscode-sharepoint-dotnet-framework-feasibility</a></li>
+        <li><a href="vscode-sharepoint-poc-runbook.html">vscode-sharepoint-poc-runbook</a></li>
+        <li><a href="vscode-sharepoint-workflow-dependency-order.html">vscode-sharepoint-workflow-dependency-order</a></li>
+      </ul>
+      <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+      </p>
+    </nav>
+    <main>
+      <article class="markdown-body">
+        <h1 id="omnisharp-server-%E5%8F%83%E8%80%83%E6%96%87%E4%BB%B6" tabindex="-1">OmniSharp Server 參考文件</h1>
+<h2 id="0-%E6%96%87%E4%BB%B6%E7%9B%AE%E7%9A%84" tabindex="-1">0. 文件目的</h2>
+<p>本文件完整記錄 <strong>OmniSharp Server</strong> 在「VS Code 取代紫色 Visual Studio 開發 SharePoint Server / <code>.NET Framework</code> 專案」這個工作流中的角色、設定、啟動方式、驗證手段與常見排查。</p>
+<blockquote>
+<p>本文件回答的問題：
+<strong>OmniSharp 是什麼？為什麼要用它？怎麼確認它正常運作？壞掉時要從哪裡看？</strong></p>
+</blockquote>
+<p>教學操作（公司電腦 PoC）請看 <a href="./vscode-sharepoint-poc-runbook.html"><code>vscode-sharepoint-poc-runbook.md</code></a>；驗收勾選請看 <a href="./vscode-sharepoint-acceptance-checklist.html"><code>vscode-sharepoint-acceptance-checklist.md</code></a>。</p>
+<hr>
+<h2 id="1-omnisharp-%E6%98%AF%E4%BB%80%E9%BA%BC" tabindex="-1">1. OmniSharp 是什麼</h2>
+<p><strong>OmniSharp</strong> 是一個開源的 <strong>C# 語言伺服器（Language Server）</strong>，提供跨編輯器的 C# 智慧編輯能力（IntelliSense、跳轉、重構、診斷）。在 VS Code 中，它是 <code>ms-dotnettools.csharp</code> 擴充套件（俗稱 &quot;C# extension&quot;）的底層引擎。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>專案首頁</td>
+<td><a href="https://www.omnisharp.net/">https://www.omnisharp.net/</a></td>
+</tr>
+<tr>
+<td>原始碼</td>
+<td><a href="https://github.com/OmniSharp/omnisharp-roslyn">https://github.com/OmniSharp/omnisharp-roslyn</a></td>
+</tr>
+<tr>
+<td>授權</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>底層編譯器</td>
+<td>Roslyn</td>
+</tr>
+<tr>
+<td>啟動方式</td>
+<td>VS Code C# 擴充套件背景啟動 <code>OmniSharp.exe</code>（或 <code>OmniSharp.dll</code>）程序</td>
+</tr>
+<tr>
+<td>通訊協定</td>
+<td>LSP（Language Server Protocol）/ stdio JSON-RPC</td>
+</tr>
+<tr>
+<td>設定來源</td>
+<td><code>omnisharp.json</code>（專案級）+ VS Code <code>settings.json</code>（<code>omnisharp.*</code> 命名空間）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-1-omnisharp-%E6%8F%90%E4%BE%9B%E4%BB%80%E9%BA%BC%E8%83%BD%E5%8A%9B" tabindex="-1">1.1 OmniSharp 提供什麼能力</h3>
+<p>對應到 SharePoint / <code>.NET Framework</code> 日常開發：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>VS Code 操作</th>
+<th>對應驗收項目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>載入 <code>.sln</code> / <code>.csproj</code> 與其參考組件</td>
+<td>開啟 workspace</td>
+<td><a href="./vscode-sharepoint-acceptance-checklist.html"><code>acceptance-checklist</code></a> B1、B2</td>
+</tr>
+<tr>
+<td>IntelliSense 自動完成（成員、命名空間）</td>
+<td>輸入 <code>SPContext.</code> 跳出成員清單</td>
+<td>B3</td>
+</tr>
+<tr>
+<td>Go to Definition</td>
+<td>F12</td>
+<td>B4</td>
+</tr>
+<tr>
+<td>Find All References</td>
+<td>Shift+F12</td>
+<td>（日常）</td>
+</tr>
+<tr>
+<td>Rename Symbol</td>
+<td>F2</td>
+<td>B5</td>
+</tr>
+<tr>
+<td>即時編譯錯誤（不需手動 build）</td>
+<td>Problems 面板紅字</td>
+<td>B7</td>
+</tr>
+<tr>
+<td>Quick Fix / Code Action</td>
+<td><code>Ctrl+.</code></td>
+<td>（日常）</td>
+</tr>
+<tr>
+<td>Roslyn Analyzers</td>
+<td>自動跑、輸出至 Problems 面板</td>
+<td>（日常）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-2-omnisharp-vs-c-dev-kit%E9%87%8D%E9%BB%9E" tabindex="-1">1.2 OmniSharp vs C# Dev Kit（重點）</h3>
+<p>VS Code 上有兩條 C# 路線：</p>
+<table>
+<thead>
+<tr>
+<th>比較項</th>
+<th>OmniSharp（本專案使用）</th>
+<th>C# Dev Kit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>擴充套件名稱</td>
+<td><code>ms-dotnettools.csharp</code>（單獨安裝，<strong>不裝 Dev Kit</strong>）</td>
+<td><code>ms-dotnettools.csdevkit</code></td>
+</tr>
+<tr>
+<td>授權</td>
+<td>MIT（開源）</td>
+<td>微軟商業授權（需符合條件）</td>
+</tr>
+<tr>
+<td>主要支援</td>
+<td><code>.NET Framework</code> + <code>.NET (Core)</code> 全系列、MSBuild 傳統格式 <code>.csproj</code></td>
+<td>主要為 SDK-style <code>.csproj</code>（<code>.NET 6+</code>）</td>
+</tr>
+<tr>
+<td><code>.NET Framework 4.x</code> 完整支援</td>
+<td>✅ 支援（走 legacy mode）</td>
+<td>❌ 不完整支援</td>
+</tr>
+<tr>
+<td>SharePoint Server Farm Solution</td>
+<td>✅ 可載入、可 IntelliSense</td>
+<td>⚠️ 載入 <code>.csproj</code> 但 IntelliSense 不穩</td>
+</tr>
+<tr>
+<td>Solution Explorer UI</td>
+<td>❌ 無（仰賴 VS Code 檔案總管）</td>
+<td>✅ 提供</td>
+</tr>
+<tr>
+<td>本專案是否使用</td>
+<td><strong>使用</strong></td>
+<td><strong>停用</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>重點：</strong> 本專案的目標是 SharePoint Server / <code>.NET Framework</code> 專案，因此必須走 <strong>OmniSharp legacy mode</strong>；C# Dev Kit 在本 workspace 必須停用或不安裝。</p>
+<hr>
+<h2 id="2-%E5%AE%89%E8%A3%9D%E8%88%87%E5%95%9F%E7%94%A8%E6%B5%81%E7%A8%8B" tabindex="-1">2. 安裝與啟用流程</h2>
+<p>OmniSharp <strong>不需要單獨安裝</strong>，它是 C# 擴充套件的內建引擎。完整觸發鏈：</p>
+<pre><code class="language-text">[1] 安裝 ms-dotnettools.csharp（C# extension）
+        ↓
+[2] 確保 C# Dev Kit 未安裝或在 workspace 停用
+        ↓
+[3] 開啟含 .cs / .csproj / .sln 的資料夾（VS Code workspace）
+        ↓
+[4] 擴充套件依 settings.json 啟動 OmniSharp Server 背景程序
+        ↓
+[5] Server 讀取 .sln/.csproj → 解析 reference → 建立 Roslyn workspace
+        ↓
+[6] VS Code 右下角狀態列出現「OmniSharp Server」🔥 圖示
+        ↓
+[7] IntelliSense / F12 / F2 / Problems 開始運作
+</code></pre>
+<h3 id="2-1-%E5%AE%89%E8%A3%9D%E6%AD%A5%E9%A9%9F" tabindex="-1">2.1 安裝步驟</h3>
+<h4 id="2-1-1-%E7%B2%BE%E7%A2%BA%E5%A5%97%E4%BB%B6%E8%B3%87%E8%A8%8A%E5%85%88%E7%9C%8B%E6%B8%85%E6%A5%9A%E5%86%8D%E8%A3%9D" tabindex="-1">2.1.1 精確套件資訊（先看清楚再裝）</h4>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>套件 ID（Extension ID）</strong></td>
+<td><code>ms-dotnettools.csharp</code></td>
+</tr>
+<tr>
+<td><strong>顯示名稱（Display Name）</strong></td>
+<td><strong>C#</strong>（就叫「C#」，不是 &quot;C# Extensions&quot;，不是 &quot;C# Dev Kit&quot;）</td>
+</tr>
+<tr>
+<td><strong>發佈者（Publisher）</strong></td>
+<td>Microsoft</td>
+</tr>
+<tr>
+<td><strong>VS Code Marketplace</strong></td>
+<td><a href="https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp">https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp</a></td>
+</tr>
+<tr>
+<td><strong>OmniSharp 是否內含？</strong></td>
+<td>✅ 是，安裝此套件就會帶入 OmniSharp Server，不需另裝</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 在 Extensions 搜尋 <code>C#</code> 會跳出多個外觀相近的套件，請依下方 §2.1.3 對照表辨識。</p>
+</blockquote>
+<h4 id="2-1-2-%E5%9B%9B%E7%A8%AE%E5%AE%89%E8%A3%9D%E6%96%B9%E5%BC%8F%E6%93%87%E4%B8%80" tabindex="-1">2.1.2 四種安裝方式（擇一）</h4>
+<blockquote>
+<p>四種方式的差別主要在「會不會開新視窗」與「是否需要鍵盤一路按到底」，效果都相同。</p>
+</blockquote>
+<p><strong>方式 A：VS Code UI（最直觀，在當前視窗）</strong></p>
+<ol>
+<li>開 VS Code，按 <code>Ctrl+Shift+X</code> 打開 Extensions。</li>
+<li>搜尋框輸入：<code>C#</code></li>
+<li>找 <strong>發佈者為 Microsoft、Display Name 就叫 &quot;C#&quot;</strong> 的那一個（通常排在最前），按 <code>Install</code>。</li>
+<li>安裝完成後，依 §2.1.4 處理 C# Dev Kit、重新載入 VS Code。</li>
+</ol>
+<p><strong>方式 B：Quick Open <code>ext install</code>（在當前視窗，鍵盤最快）</strong></p>
+<p>在已開啟的 VS Code 視窗內：</p>
+<ol>
+<li>
+<p>按 <code>Ctrl+P</code> 打開 Quick Open。</p>
+</li>
+<li>
+<p>貼上下列指令並按 Enter：</p>
+<pre><code class="language-text">ext install ms-dotnettools.csharp
+</code></pre>
+</li>
+<li>
+<p>直接在當前視窗的 Extensions view 觸發安裝，<strong>不會開新視窗、不會起新 process</strong>。</p>
+</li>
+</ol>
+<p><strong>方式 C：命令列（最精確，可寫進 setup script，會另開新視窗）</strong></p>
+<p>在外部終端（PowerShell / cmd）執行：</p>
+<pre><code class="language-powershell">code --install-extension ms-dotnettools.csharp
+</code></pre>
+<ul>
+<li>直接用 Extension ID 安裝，不會誤觸其他同名套件；適合公司新人 onboarding script、CI / dotfiles 重建。</li>
+<li>注意：此 CLI 指令會啟動一個獨立的 VS Code instance 處理安裝，看起來像「開了新視窗」；行為設計上就是不依賴現有視窗，無法用參數關掉。若想在當前視窗安裝，改用方式 A 或方式 B。</li>
+</ul>
+<p><strong>方式 D：<code>.vsix</code> 離線安裝（公司網路擋 Marketplace 時的備案）</strong></p>
+<ol>
+<li>
+<p>在有外部網路的電腦下載 vsix：開啟 <a href="https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp">https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp</a> → 右側 <code>Resources</code> 區塊點 <code>Download Extension</code>。</p>
+</li>
+<li>
+<p>將 <code>.vsix</code> 檔拷貝到公司電腦（USB / 內部檔案分享）。</p>
+</li>
+<li>
+<p>在公司電腦選一種方式安裝：</p>
+<pre><code class="language-powershell">code --install-extension &quot;C:\path\to\csharp-x.x.x.vsix&quot;
+</code></pre>
+<p>或：VS Code → Extensions → 右上角 <code>...</code> 選單 → <code>Install from VSIX...</code> → 選檔（在當前視窗）。</p>
+</li>
+</ol>
+<p><strong>方式對照表：</strong></p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>開新視窗？</th>
+<th>操作位置</th>
+<th>適用情境</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Extensions UI</td>
+<td>❌ 當前視窗</td>
+<td>VS Code 內</td>
+<td>想先看套件詳情、評分</td>
+</tr>
+<tr>
+<td>B. Quick Open <code>ext install</code></td>
+<td>❌ 當前視窗</td>
+<td>VS Code 內</td>
+<td>鍵盤最快、知道 ID</td>
+</tr>
+<tr>
+<td>C. <code>code --install-extension</code></td>
+<td>⚠️ 會起新 instance</td>
+<td>外部終端</td>
+<td>寫進 script / onboarding 自動化</td>
+</tr>
+<tr>
+<td>D. <code>.vsix</code> 離線</td>
+<td>視子方式而定</td>
+<td>兩者皆可</td>
+<td>公司網路擋 Marketplace</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2-1-3-%E5%90%8C%E5%90%8D%E5%A5%97%E4%BB%B6%E8%BE%A8%E8%AD%98%E8%A1%A8%E6%90%9C%E5%B0%8B-c-%E6%9C%83%E7%9C%8B%E5%88%B0%E7%9A%84%E6%89%80%E6%9C%89%E6%9D%B1%E8%A5%BF" tabindex="-1">2.1.3 同名套件辨識表（搜尋 <code>C#</code> 會看到的所有東西）</h4>
+<table>
+<thead>
+<tr>
+<th>你看到的名稱</th>
+<th>Publisher</th>
+<th>Extension ID</th>
+<th>本專案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C#</strong></td>
+<td>Microsoft</td>
+<td><code>ms-dotnettools.csharp</code></td>
+<td>✅ <strong>要裝</strong>（OmniSharp 在裡面）</td>
+</tr>
+<tr>
+<td>C# Dev Kit</td>
+<td>Microsoft</td>
+<td><code>ms-dotnettools.csdevkit</code></td>
+<td>❌ <strong>不要裝</strong>（會搶 OmniSharp 接管 <code>.cs</code>）</td>
+</tr>
+<tr>
+<td>IntelliCode for C# Dev Kit</td>
+<td>Microsoft</td>
+<td><code>ms-dotnettools.vscodeintellicode-csharp</code></td>
+<td>❌ 不要裝（屬於 Dev Kit 生態）</td>
+</tr>
+<tr>
+<td>.NET Install Tool</td>
+<td>Microsoft</td>
+<td><code>ms-dotnettools.vscode-dotnet-runtime</code></td>
+<td>⚪ 跟著 C# 自動安裝為相依，不用手動處理</td>
+</tr>
+<tr>
+<td>C# Extensions</td>
+<td>JosKreativ / kreativ-software</td>
+<td><code>kreativ-software.csharpextensions</code></td>
+<td>❌ <strong>不要裝</strong>（與 OmniSharp 無關，是 snippet 工具）</td>
+</tr>
+<tr>
+<td>C# XML Documentation Comments</td>
+<td>k--kato</td>
+<td><code>k--kato.docomment</code></td>
+<td>⚪ 選配（自動補 <code>///</code> 註解，與 OmniSharp 不衝突）</td>
+</tr>
+</tbody>
+</table>
+<p>辨識重點：<strong>Publisher 必須是 <code>Microsoft</code>，且 Extension ID 必須是 <code>ms-dotnettools.csharp</code></strong>，兩者同時成立才是對的套件。</p>
+<h4 id="2-1-4-%E5%AE%89%E8%A3%9D%E5%BE%8C%E5%BF%85%E5%81%9A%E5%85%A9%E4%BB%B6%E4%BA%8B" tabindex="-1">2.1.4 安裝後必做兩件事</h4>
+<ol>
+<li><strong>檢查並停用 C# Dev Kit（若已安裝）：</strong>
+<ul>
+<li>Extensions → 搜尋 <code>C# Dev Kit</code> → 若顯示 <code>Installed</code> 且 <code>Enabled</code>，按齒輪 → <code>Disable (Workspace)</code>，<strong>只在本 workspace 停用</strong>，不影響其他 .NET (Core) 專案。</li>
+<li>對應驗收清單 A3（<code>acceptance-checklist.md:64</code>）。</li>
+</ul>
+</li>
+<li><strong>重新載入 VS Code 視窗：</strong>
+<ul>
+<li><code>Ctrl+Shift+P</code> → <code>Developer: Reload Window</code>，讓 OmniSharp Server 以正確設定重新啟動。</li>
+</ul>
+</li>
+</ol>
+<p>完成後接 §3.1 驗證 OmniSharp 確實啟動。</p>
+<h3 id="2-2-%E6%9C%AC%E5%B0%88%E6%A1%88%E4%BD%BF%E7%94%A8%E7%9A%84-settings-json" tabindex="-1">2.2 本專案使用的 <code>settings.json</code></h3>
+<p>本 repo 的 <code>.vscode/settings.json</code> 已預先設定好 OmniSharp legacy mode：</p>
+<pre><code class="language-jsonc">{
+  &quot;dotnet.server.useOmnisharp&quot;: true,               // 強制走 OmniSharp，不走 Dev Kit 路徑
+  &quot;omnisharp.useModernNet&quot;: false,                  // 走 .NET Framework 相容模式（關鍵！）
+  &quot;omnisharp.enableMsBuildLoadProjectsOnDemand&quot;: false, // 啟動時立即載入所有專案，不延遲
+  &quot;omnisharp.enableRoslynAnalyzers&quot;: true           // 啟用 Roslyn analyzers
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>設定鍵</th>
+<th>為什麼這樣設</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dotnet.server.useOmnisharp: true</code></td>
+<td>C# extension 預設可能切到 Dev Kit 路徑，本設定強制留在 OmniSharp。</td>
+</tr>
+<tr>
+<td><code>omnisharp.useModernNet: false</code></td>
+<td><code>true</code> 會跑在 .NET 6+ runtime 上、僅支援 SDK-style 專案；<code>.NET Framework 4.x</code> + 傳統 <code>.csproj</code> <strong>必須設為 <code>false</code></strong>，否則載不到專案。</td>
+</tr>
+<tr>
+<td><code>omnisharp.enableMsBuildLoadProjectsOnDemand: false</code></td>
+<td>預設 <code>false</code> 已正確；若被改成 <code>true</code>，跨檔跳轉時容易出現「載入中」延遲。</td>
+</tr>
+<tr>
+<td><code>omnisharp.enableRoslynAnalyzers: true</code></td>
+<td>啟用後 Problems 面板會多顯示 analyzer 警告；對程式碼品質有幫助。</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>這些設定已 commit 到 repo，使用者只要 <code>git pull</code> 就會生效，<strong>不需要手動設定</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="3-%E5%95%9F%E5%8B%95%E9%A9%97%E8%AD%89" tabindex="-1">3. 啟動驗證</h2>
+<h3 id="3-1-%E6%80%8E%E9%BA%BC%E7%9F%A5%E9%81%93-omnisharp-%E5%B7%B2%E5%95%9F%E5%8B%95" tabindex="-1">3.1 怎麼知道 OmniSharp 已啟動？</h3>
+<table>
+<thead>
+<tr>
+<th>驗證方式</th>
+<th>預期看到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>右下角狀態列</td>
+<td>🔥 圖示 + <code>OmniSharp Server</code>，滑鼠移上去顯示 <code>Running</code></td>
+</tr>
+<tr>
+<td><code>View → Output</code> 切到 <code>OmniSharp Log</code> channel</td>
+<td>出現 <code>OmniSharp server started</code>、<code>Loaded project 'xxx.csproj'</code></td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+P</code> → <code>OmniSharp: Show Output</code></td>
+<td>同上，可直接開啟 OmniSharp Log</td>
+</tr>
+<tr>
+<td>工作管理員 / <code>Get-Process</code></td>
+<td>出現 <code>OmniSharp</code> 或 <code>OmniSharp.exe</code> 程序</td>
+</tr>
+<tr>
+<td>開 <code>.cs</code> 檔輸入 <code>System.</code></td>
+<td>跳出成員清單，證明 IntelliSense 在運作</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4command-palette-ctrlshiftp" tabindex="-1">3.2 常用指令（Command Palette <code>Ctrl+Shift+P</code>）</h3>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OmniSharp: Restart OmniSharp</code></td>
+<td>重啟伺服器（最常用，設定改完或載入失敗時）</td>
+</tr>
+<tr>
+<td><code>OmniSharp: Show Output</code></td>
+<td>開啟 OmniSharp Log 輸出視窗</td>
+</tr>
+<tr>
+<td><code>OmniSharp: Select Project</code></td>
+<td>多 solution 時手動選要載入哪一個</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4-omnisharp-log-%E8%A7%A3%E8%AE%80" tabindex="-1">4. OmniSharp Log 解讀</h2>
+<p>OmniSharp Log 是排查問題的主要入口。常見訊息：</p>
+<table>
+<thead>
+<tr>
+<th>Log 訊息</th>
+<th>意義</th>
+<th>動作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Starting OmniSharp server at ...</code></td>
+<td>啟動中</td>
+<td>等待</td>
+</tr>
+<tr>
+<td><code>OmniSharp server started.</code></td>
+<td>啟動成功</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>Loaded project 'xxx.csproj'</code></td>
+<td>專案載入成功</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>Could not locate MSBuild instance</code></td>
+<td>找不到 MSBuild</td>
+<td>對照 <a href="./vscode-sharepoint-poc-runbook.html"><code>runbook §2</code></a> 安裝 Build Tools</td>
+</tr>
+<tr>
+<td><code>MSB4019: The imported project ... was not found</code></td>
+<td>targets 檔缺失（常為 SharePoint targets）</td>
+<td>對照 <a href="./vscode-sharepoint-poc-runbook.html"><code>runbook §2</code></a></td>
+</tr>
+<tr>
+<td><code>Project does not target a recognized framework</code></td>
+<td><code>useModernNet</code> 設定錯</td>
+<td>檢查 <code>omnisharp.useModernNet: false</code></td>
+</tr>
+<tr>
+<td><code>OmniSharp.MSBuild.ProjectManager: Failed to load project</code></td>
+<td>專案載入失敗</td>
+<td>看後續錯誤行</td>
+</tr>
+<tr>
+<td><code>Detected Visual Studio version: 17.x</code></td>
+<td>偵測到 Build Tools</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8C%E8%88%87%E6%8E%92%E6%9F%A5" tabindex="-1">5. 常見問題與排查</h2>
+<h3 id="5-1-intellisense-%E5%AE%8C%E5%85%A8%E6%B2%92%E5%8F%8D%E6%87%89b3-%E5%A4%B1%E6%95%97" tabindex="-1">5.1 IntelliSense 完全沒反應（B3 失敗）</h3>
+<p><strong>排查順序：</strong></p>
+<ol>
+<li><strong>右下角狀態列有沒有 🔥 OmniSharp Server？</strong>
+<ul>
+<li>沒有 → C# extension 未安裝或被 Dev Kit 搶走，回 §2.1。</li>
+</ul>
+</li>
+<li><strong>是不是 C# Dev Kit 接管？</strong>
+<ul>
+<li>Extensions 搜尋 <code>C# Dev Kit</code>，若顯示已啟用 → <code>Disable (Workspace)</code>。</li>
+</ul>
+</li>
+<li><strong><code>settings.json</code> 是否生效？</strong>
+<ul>
+<li><code>Ctrl+Shift+P</code> → <code>Preferences: Open Workspace Settings (JSON)</code>，確認 <code>useOmnisharp: true</code> 與 <code>useModernNet: false</code> 存在。</li>
+</ul>
+</li>
+<li><strong>OmniSharp Log 有沒有錯誤？</strong>
+<ul>
+<li><code>Ctrl+Shift+P</code> → <code>OmniSharp: Show Output</code>，找紅色 <code>error</code> 行。</li>
+</ul>
+</li>
+<li><strong>重啟 OmniSharp。</strong>
+<ul>
+<li><code>Ctrl+Shift+P</code> → <code>OmniSharp: Restart OmniSharp</code>。</li>
+</ul>
+</li>
+<li><strong>重啟 VS Code。</strong>
+<ul>
+<li><code>Developer: Reload Window</code>。</li>
+</ul>
+</li>
+</ol>
+<h3 id="5-2-intellisense-%E9%83%A8%E5%88%86%E6%AA%94%E6%A1%88%E6%9C%89%E9%83%A8%E5%88%86%E6%B2%92%E6%9C%89" tabindex="-1">5.2 IntelliSense 部分檔案有、部分沒有</h3>
+<p>通常是 <strong>某個 <code>.csproj</code> 載入失敗</strong>。</p>
+<ul>
+<li>開 OmniSharp Log，搜尋 <code>Failed to load project</code>，看是哪一個專案、什麼原因。</li>
+<li>常見原因：缺 SharePoint targets、缺 reference assembly、<code>.csproj</code> 語法錯誤。</li>
+</ul>
+<h3 id="5-3-%E8%B7%A8%E6%AA%94%E8%B7%B3%E8%BD%89-f12-%E8%B7%B3%E4%B8%8D%E5%88%B0" tabindex="-1">5.3 跨檔跳轉 F12 跳不到</h3>
+<ul>
+<li>確認 <code>omnisharp.enableMsBuildLoadProjectsOnDemand: false</code>（本 repo 預設）。</li>
+<li>若是跳到外部組件（<code>SPContext</code> 等），第一次跳轉會解 metadata，需要幾秒。</li>
+</ul>
+<h3 id="5-4-omnisharp-%E4%B8%80%E7%9B%B4%E5%9C%A8-loading-" tabindex="-1">5.4 OmniSharp 一直在 <code>Loading...</code></h3>
+<ul>
+<li>大型 solution 第一次載入可能需要 1～3 分鐘，請等待。</li>
+<li>超過 5 分鐘仍未完成：開 OmniSharp Log 看卡在哪個專案。</li>
+<li>終極手段：刪除 <code>.vs/</code>、<code>bin/</code>、<code>obj/</code> 後重啟 OmniSharp。</li>
+</ul>
+<h3 id="5-5-%E6%94%B9%E4%BA%86-settings-json-%E6%B2%92%E6%95%88%E6%9E%9C" tabindex="-1">5.5 改了 <code>settings.json</code> 沒效果</h3>
+<ul>
+<li>OmniSharp 設定變更後，<strong>必須重啟 OmniSharp</strong> 才會生效：<code>OmniSharp: Restart OmniSharp</code>。</li>
+</ul>
+<hr>
+<h2 id="6-%E8%88%87%E5%85%B6%E4%BB%96%E5%85%83%E4%BB%B6%E7%9A%84%E9%97%9C%E4%BF%82" tabindex="-1">6. 與其他元件的關係</h2>
+<pre class="mermaid">flowchart LR
+    A[VS Code] --&gt;|啟動| B[ms-dotnettools.csharp]
+    B --&gt;|spawn| C[OmniSharp Server]
+    C --&gt;|LSP/JSON-RPC| A
+    C --&gt;|讀取| D[.sln / .csproj]
+    C --&gt;|呼叫| E[MSBuild / Roslyn]
+    E --&gt;|解析 reference| F[reference assemblies&lt;br/&gt;.NET Framework / SharePoint]
+
+    G[C# Dev Kit] -.被停用.-&gt; A
+</pre>
+<table>
+<thead>
+<tr>
+<th>元件</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VS Code</td>
+<td>編輯器 UI</td>
+</tr>
+<tr>
+<td>C# extension</td>
+<td>OmniSharp 的 host，負責啟動與通訊</td>
+</tr>
+<tr>
+<td>OmniSharp Server</td>
+<td>C# 語言伺服器，提供 IntelliSense / 跳轉 / 重構</td>
+</tr>
+<tr>
+<td>MSBuild</td>
+<td>OmniSharp 用來解析 <code>.csproj</code> 結構與相依</td>
+</tr>
+<tr>
+<td>Roslyn</td>
+<td>OmniSharp 內建編譯器，產生語法樹與診斷</td>
+</tr>
+<tr>
+<td>reference assemblies</td>
+<td><code>.NET Framework</code> 4.x SDK + SharePoint DLLs</td>
+</tr>
+<tr>
+<td>C# Dev Kit</td>
+<td><strong>本專案不使用</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注意：OmniSharp 只負責「編輯期智慧能力」，不負責 build / package / deploy。後者由 <code>scripts/*.ps1</code> 透過 MSBuild 與 SharePoint PowerShell 完成，兩條鏈完全獨立。</p>
+</blockquote>
+<hr>
+<h2 id="7-%E4%B8%8D%E5%9C%A8-omnisharp-%E7%AF%84%E5%9C%8D%E5%85%A7" tabindex="-1">7. 不在 OmniSharp 範圍內</h2>
+<p>以下能力 OmniSharp <strong>不提供</strong>，本專案也不打算用 OmniSharp 解決：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>替代方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>編譯產生 <code>.dll</code> / <code>.wsp</code></td>
+<td><code>scripts/build.ps1</code> + <code>scripts/package.ps1</code>（MSBuild）</td>
+</tr>
+<tr>
+<td>Validate Package</td>
+<td><code>scripts/validate-package.ps1</code></td>
+</tr>
+<tr>
+<td>部署到 SharePoint Server</td>
+<td><code>scripts/deploy-wsp.ps1</code>（SharePoint PowerShell）</td>
+</tr>
+<tr>
+<td>Update / Retract</td>
+<td><code>scripts/update-wsp.ps1</code>、<code>scripts/retract-wsp.ps1</code></td>
+</tr>
+<tr>
+<td>Package Designer / Feature Designer UI</td>
+<td>直接編輯 XML</td>
+</tr>
+<tr>
+<td>WinForms / WPF Designer</td>
+<td>不在本專案範圍</td>
+</tr>
+<tr>
+<td>Debug attach to <code>w3wp.exe</code>（SharePoint process）</td>
+<td>需另外用 VS Code C# debugger + 額外設定，目前未驗證</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="8-%E8%88%87%E6%9C%AC%E5%B0%88%E6%A1%88%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8D%E6%87%89" tabindex="-1">8. 與本專案文件的對應</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>與本文件的關係</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./framework.html"><code>framework.md</code></a></td>
+<td>原始需求</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-dotnet-framework-feasibility.html"><code>vscode-sharepoint-dotnet-framework-feasibility.md</code></a></td>
+<td>§「建議 VS Code workspace 設定」決定使用 OmniSharp legacy mode</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-workflow-dependency-order.html"><code>vscode-sharepoint-workflow-dependency-order.md</code></a></td>
+<td>任務 2 產出 <code>.vscode/settings.json</code> 含 OmniSharp 設定</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-poc-runbook.html"><code>vscode-sharepoint-poc-runbook.md</code></a></td>
+<td>§1 列出 C# extension 為必要工具</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-acceptance-checklist.html"><code>vscode-sharepoint-acceptance-checklist.md</code></a></td>
+<td>Stage 1 A2/A3、Stage 2 B1～B5/B7 驗證 OmniSharp 行為</td>
+</tr>
+<tr>
+<td><strong>本文件</strong></td>
+<td>OmniSharp 完整參考；前述文件提到 OmniSharp 時皆可回查本文件</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="9-%E5%8F%83%E8%80%83%E9%80%A3%E7%B5%90" tabindex="-1">9. 參考連結</h2>
+<ul>
+<li>OmniSharp 官網：<a href="https://www.omnisharp.net/">https://www.omnisharp.net/</a></li>
+<li>OmniSharp on GitHub：<a href="https://github.com/OmniSharp/omnisharp-roslyn">https://github.com/OmniSharp/omnisharp-roslyn</a></li>
+<li>VS Code C# extension：<a href="https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp">https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp</a></li>
+<li>C# Dev Kit FAQ（含與 OmniSharp 共存說明）：<a href="https://code.visualstudio.com/docs/csharp/cs-dev-kit-faq">https://code.visualstudio.com/docs/csharp/cs-dev-kit-faq</a></li>
+<li>OmniSharp 設定參考：<a href="https://github.com/OmniSharp/omnisharp-vscode/blob/master/package.json">https://github.com/OmniSharp/omnisharp-vscode/blob/master/package.json</a>（搜尋 <code>omnisharp.*</code> 設定鍵）</li>
+</ul>
+
+        <div class="doc-footer">
+          原始檔：<code>docs/omnisharp-server-reference.md</code> · 產生時間：2026-05-17 09:47:57 UTC
+        </div>
+      </article>
+    </main>
+  </div>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js"></script>
+  <script>
+    if (window.hljs) {
+      document.querySelectorAll('pre code').forEach((block) => {
+        if (!block.parentElement.classList.contains('mermaid')) {
+          hljs.highlightElement(block);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

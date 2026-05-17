@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code 支援 SharePoint / .NET Framework 開發可行性評估</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    nav.sidebar {
+      background: #fff;
+      border-right: 1px solid #d1d9e0;
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav.sidebar h2 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #59636e;
+      margin: 0 0 12px;
+      padding: 0 10px;
+    }
+    nav.sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+    nav.sidebar li {
+      margin: 2px 0;
+    }
+    nav.sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #1f2328;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    nav.sidebar a:hover {
+      background: #eaeef2;
+    }
+    nav.sidebar li.active > a {
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 600;
+    }
+    main {
+      padding: 32px 48px;
+      background: #fff;
+      min-width: 0;
+    }
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 100%;
+    }
+    .markdown-body pre.mermaid {
+      background: #f6f8fa;
+      padding: 16px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .markdown-body pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      main { padding: 16px; }
+    }
+    .doc-footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #d1d9e0;
+      font-size: 12px;
+      color: #59636e;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <h2>docs/</h2>
+      <ul>
+                <li><a href="README.html">README</a></li>
+        <li><a href="framework.html">framework</a></li>
+        <li><a href="omnisharp-server-reference.html">omnisharp-server-reference</a></li>
+        <li><a href="vscode-sharepoint-acceptance-checklist.html">vscode-sharepoint-acceptance-checklist</a></li>
+        <li class="active"><a href="#">vscode-sharepoint-dotnet-framework-feasibility</a></li>
+        <li><a href="vscode-sharepoint-poc-runbook.html">vscode-sharepoint-poc-runbook</a></li>
+        <li><a href="vscode-sharepoint-workflow-dependency-order.html">vscode-sharepoint-workflow-dependency-order</a></li>
+      </ul>
+      <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+      </p>
+    </nav>
+    <main>
+      <article class="markdown-body">
+        <h1 id="vs-code-%E6%94%AF%E6%8F%B4-sharepoint--net-framework-%E9%96%8B%E7%99%BC%E5%8F%AF%E8%A1%8C%E6%80%A7%E8%A9%95%E4%BC%B0" tabindex="-1">VS Code 支援 SharePoint / .NET Framework 開發可行性評估</h1>
+<h2 id="%E8%83%8C%E6%99%AF" tabindex="-1">背景</h2>
+<p>本評估延續 <code>docs/framework.md</code> 的問題脈絡：希望保留藍色 Visual Studio Code 的輕量工作流，避免依賴紫色 Visual Studio 作為日常主要 IDE，同時仍能支援公司 Windows Server / SharePoint Server 專案所需的 <code>.NET Framework</code> 開發、打包與部署流程。</p>
+<p>補充需求如下：</p>
+<ol>
+<li>主要場景是 SharePoint Server / Windows Server 相關開發。</li>
+<li>需要支援建置、<code>.wsp</code> 打包、部署或更新。</li>
+<li>不需要 WinForms / WPF / Razor 視覺化設計器。</li>
+<li>目標不是重做完整 Visual Studio，而是讓 VS Code 承接日常開發流程。</li>
+</ol>
+<h2 id="%E7%B5%90%E8%AB%96" tabindex="-1">結論</h2>
+<p>可行，但定位應是「VS Code + MSBuild + PowerShell 的 SharePoint 開發工作流」，不是「VS Code 完整取代 Visual Studio SharePoint IDE」。</p>
+<p>VS Code 可以作為主要編輯器，負責 C#、XML、PowerShell、設定檔與部署腳本維護；建置與打包應交給 MSBuild；部署應交給 SharePoint Management Shell / PowerShell cmdlet。</p>
+<p>此方案適合目前需求，因為本案明確不需要 WinForms、WPF、Razor 或拖拉式 Designer。若未來需求包含 Visual Studio SharePoint Project Template、Package Designer、Feature Designer、Server Explorer 等視覺化工具，VS Code 方案會明顯不足。</p>
+<h2 id="%E5%8F%AF%E8%A1%8C%E7%AF%84%E5%9C%8D" tabindex="-1">可行範圍</h2>
+<p>VS Code 可承接下列工作：</p>
+<ol>
+<li>編輯 <code>.sln</code>、<code>.csproj</code>、C# 原始碼、Feature XML、Elements XML、Package XML。</li>
+<li>透過 C# extension / OmniSharp 提供 legacy <code>.NET Framework</code> 專案的基本 IntelliSense、跳轉、重構與診斷。</li>
+<li>透過 <code>.vscode/tasks.json</code> 包裝建置、打包、驗證與部署命令。</li>
+<li>透過 MSBuild target 執行 SharePoint package：
+<ul>
+<li><code>msbuild /t:Package ProjectFileName.csproj</code></li>
+<li><code>msbuild /t:ValidatePackage ProjectFileName.csproj</code></li>
+<li><code>msbuild /t:CleanPackage ProjectFileName.csproj</code></li>
+</ul>
+</li>
+<li>透過 PowerShell / SharePoint Management Shell 部署 <code>.wsp</code>：
+<ul>
+<li><code>Add-SPSolution</code></li>
+<li><code>Install-SPSolution</code></li>
+<li><code>Update-SPSolution</code></li>
+<li><code>Uninstall-SPSolution</code></li>
+<li><code>Remove-SPSolution</code></li>
+</ul>
+</li>
+<li>將建置、打包、部署流程版本化，降低對個人 IDE 設定的依賴。</li>
+</ol>
+<h2 id="%E4%B8%8D%E5%BB%BA%E8%AD%B0%E6%89%BF%E8%AB%BE%E7%9A%84%E7%AF%84%E5%9C%8D" tabindex="-1">不建議承諾的範圍</h2>
+<p>VS Code 不應承諾完整取代下列 Visual Studio SharePoint 工具：</p>
+<ol>
+<li>SharePoint 專案範本 UI。</li>
+<li>Package Designer / Feature Designer。</li>
+<li>Server Explorer 與 SharePoint 站台瀏覽 UI。</li>
+<li>Visual Studio 內建的 Deploy command 完整體驗。</li>
+<li>依賴 Visual Studio Designer 的 Windows UI 開發。</li>
+</ol>
+<p>這些功能即使可以部分用 XML、PowerShell 或自製 extension 補足，也不應視為短期內能低成本完整復刻。</p>
+<h2 id="%E5%BB%BA%E8%AD%B0%E6%8A%80%E8%A1%93%E8%B7%AF%E7%B7%9A" tabindex="-1">建議技術路線</h2>
+<p>第一階段先建立可重複執行的命令列工作流，不急著開發 VS Code extension。</p>
+<p>建議優先產出：</p>
+<ol>
+<li><code>.vscode/settings.json</code>
+<ul>
+<li>啟用 OmniSharp legacy 模式。</li>
+<li>避免 C# Dev Kit 對 <code>.NET Framework</code> 專案造成不相容接管。</li>
+</ul>
+</li>
+<li><code>.vscode/tasks.json</code>
+<ul>
+<li><code>build</code></li>
+<li><code>package</code></li>
+<li><code>validate-package</code></li>
+<li><code>deploy-wsp</code></li>
+<li><code>update-wsp</code></li>
+<li><code>retract-wsp</code></li>
+</ul>
+</li>
+<li><code>scripts/</code>
+<ul>
+<li><code>build.ps1</code></li>
+<li><code>package.ps1</code></li>
+<li><code>deploy-wsp.ps1</code></li>
+<li><code>update-wsp.ps1</code></li>
+<li><code>retract-wsp.ps1</code></li>
+</ul>
+</li>
+<li>專案 README 或操作手冊
+<ul>
+<li>記錄必要工具、環境變數、SharePoint 伺服器權限與部署步驟。</li>
+</ul>
+</li>
+</ol>
+<p>第二階段再評估是否開發 VS Code extension。extension 的價值應集中在「把穩定的 tasks / scripts 包成按鈕與 Command Palette 命令」，而不是重做 Visual Studio Designer。</p>
+<h2 id="%E5%BF%85%E8%A6%81%E7%92%B0%E5%A2%83" tabindex="-1">必要環境</h2>
+<p>Windows 開發機或可連到 SharePoint Server 的部署環境需要具備：</p>
+<ol>
+<li>Visual Studio Code。</li>
+<li><code>ms-dotnettools.csharp</code> extension。</li>
+<li><code>.NET Framework Developer Pack</code>，版本需符合專案 Target Framework。</li>
+<li>Visual Studio Build Tools 或其他可提供 <code>MSBuild.exe</code> 的工具鏈。</li>
+<li>SharePoint Server 開發/部署所需 assembly、targets 或相關 SDK。</li>
+<li>SharePoint Management Shell 或可載入 SharePoint PowerShell snap-in/module 的 PowerShell 環境。</li>
+<li>足夠部署權限，例如 Farm Administrator 或被授權執行 solution 部署的帳號。</li>
+</ol>
+<p>建議 VS Code workspace 設定：</p>
+<pre><code class="language-json">{
+  &quot;dotnet.server.useOmnisharp&quot;: true,
+  &quot;omnisharp.useModernNet&quot;: false
+}
+</code></pre>
+<h2 id="%E6%B1%BA%E7%AD%96%E7%90%86%E7%94%B1" tabindex="-1">決策理由</h2>
+<p>此方案可行的原因：</p>
+<ol>
+<li>SharePoint <code>.wsp</code> 打包可由 MSBuild target 執行，不必只能透過 Visual Studio UI。</li>
+<li>SharePoint solution 部署可由 PowerShell cmdlet 執行，不必只能透過 Visual Studio Deploy command。</li>
+<li>本案不需要 Windows 桌面 UI Designer，因此 VS Code 最大缺口不影響主要目標。</li>
+<li>以 script / task 固化流程，比依賴 IDE UI 更適合公司專案標準化與 CI/CD 延伸。</li>
+</ol>
+<p>主要風險：</p>
+<ol>
+<li>Legacy <code>.NET Framework</code> 專案在 VS Code 的 C# 體驗不如現代 SDK-style <code>.NET</code> 專案。</li>
+<li>C# Dev Kit 明確不支援 <code>.NET Framework</code> projects，需改用 C# extension / OmniSharp legacy 模式。</li>
+<li>SharePoint 專案可能依賴 Visual Studio 安裝的 SharePoint targets 或特定 registry/path 設定，需要逐案驗證。</li>
+<li>部署 SharePoint solution 牽涉 IIS、GAC、Feature activation、Timer Service 等伺服器狀態，需用腳本清楚處理錯誤與回滾。</li>
+</ol>
+<h2 id="%E5%BB%BA%E8%AD%B0%E6%B1%BA%E7%AD%96" tabindex="-1">建議決策</h2>
+<p>採用 VS Code 作為主要工作流是合理的，但應採「命令列驅動」策略：</p>
+<ol>
+<li>短期：建立 VS Code tasks + PowerShell scripts，先讓 build / package / deploy 可重複執行。</li>
+<li>中期：整理公司專案通用腳本模板與環境檢查腳本。</li>
+<li>長期：若多個專案都使用同一套流程，再開發 VS Code extension 封裝命令與狀態提示。</li>
+</ol>
+<p>不建議第一步就開發大型 extension。因為真正高風險的部分不是 VS Code UI，而是 SharePoint legacy build targets、部署權限、伺服器狀態與 <code>.wsp</code> 更新流程是否穩定。</p>
+<h2 id="%E5%8F%83%E8%80%83%E4%BE%9D%E6%93%9A" tabindex="-1">參考依據</h2>
+<ol>
+<li>VS Code C# 官方文件：<code>https://code.visualstudio.com/docs/languages/csharp</code></li>
+<li>C# Dev Kit FAQ：<code>https://code.visualstudio.com/docs/csharp/cs-dev-kit-faq</code></li>
+<li>官方 C# extension repository：<code>https://github.com/dotnet/vscode-csharp</code></li>
+<li>MSBuild 官方文件：<code>https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild</code></li>
+<li>SharePoint solution package MSBuild tasks：<code>https://learn.microsoft.com/en-us/visualstudio/sharepoint/how-to-create-a-sharepoint-solution-package-by-using-msbuild-tasks</code></li>
+<li>SharePoint solution deploy / publish：<code>https://learn.microsoft.com/en-us/visualstudio/sharepoint/deploying-publishing-and-upgrading-sharepoint-solution-packages</code></li>
+<li>SharePoint <code>Install-SPSolution</code> PowerShell：<code>https://learn.microsoft.com/en-us/powershell/module/sharepoint-server/install-spsolution</code></li>
+</ol>
+
+        <div class="doc-footer">
+          原始檔：<code>docs/vscode-sharepoint-dotnet-framework-feasibility.md</code> · 產生時間：2026-05-17 09:47:57 UTC
+        </div>
+      </article>
+    </main>
+  </div>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js"></script>
+  <script>
+    if (window.hljs) {
+      document.querySelectorAll('pre code').forEach((block) => {
+        if (!block.parentElement.classList.contains('mermaid')) {
+          hljs.highlightElement(block);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

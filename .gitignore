@@ -1,0 +1,22 @@
+## Node.js
+node_modules/
+npm-debug.log*
+
+## .NET build output
+bin/
+obj/
+
+## VS / IDE
+.vs/
+*.user
+*.suo
+
+## Generated HTML 預覽（保留原始 .md 為來源；HTML 由 scripts/build-docs-html.ps1 產生）
+# 註：docs/html/*.html 仍然 commit，方便不安裝 Node 的使用者直接開啟
+# 若不想 commit HTML，取消下行註解
+# docs/html/
+
+## Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

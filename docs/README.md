@@ -2,6 +2,8 @@
 
 本目錄記錄「以藍色 Visual Studio Code 取代紫色 Visual Studio 開發 SharePoint Server / `.NET Framework` 專案」這個假設的決策、流程、操作與驗收，按生命週期分成 5 份主文件，並另附 1 份元件參考文件。
 
+> 💡 **想用瀏覽器閱讀？** 直接開啟 [`docs/html/index.html`](./html/index.html)。HTML 版含側邊導覽、Mermaid 圖渲染、語法高亮，閱讀體驗較佳。重新產生方式：在 repo 根目錄執行 `.\scripts\build-docs-html.ps1`（需要 Node.js）。
+
 ## 文件總覽
 
 | # | 文件 | 角色定位 | 回答的問題 | 主要讀者 |

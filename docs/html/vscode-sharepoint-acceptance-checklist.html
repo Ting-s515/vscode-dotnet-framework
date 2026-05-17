@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code 取代 Visual Studio 開發 SharePoint：使用者驗收清單</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    nav.sidebar {
+      background: #fff;
+      border-right: 1px solid #d1d9e0;
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav.sidebar h2 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #59636e;
+      margin: 0 0 12px;
+      padding: 0 10px;
+    }
+    nav.sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+    nav.sidebar li {
+      margin: 2px 0;
+    }
+    nav.sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #1f2328;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    nav.sidebar a:hover {
+      background: #eaeef2;
+    }
+    nav.sidebar li.active > a {
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 600;
+    }
+    main {
+      padding: 32px 48px;
+      background: #fff;
+      min-width: 0;
+    }
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 100%;
+    }
+    .markdown-body pre.mermaid {
+      background: #f6f8fa;
+      padding: 16px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .markdown-body pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      main { padding: 16px; }
+    }
+    .doc-footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #d1d9e0;
+      font-size: 12px;
+      color: #59636e;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <h2>docs/</h2>
+      <ul>
+                <li><a href="README.html">README</a></li>
+        <li><a href="framework.html">framework</a></li>
+        <li><a href="omnisharp-server-reference.html">omnisharp-server-reference</a></li>
+        <li class="active"><a href="#">vscode-sharepoint-acceptance-checklist</a></li>
+        <li><a href="vscode-sharepoint-dotnet-framework-feasibility.html">vscode-sharepoint-dotnet-framework-feasibility</a></li>
+        <li><a href="vscode-sharepoint-poc-runbook.html">vscode-sharepoint-poc-runbook</a></li>
+        <li><a href="vscode-sharepoint-workflow-dependency-order.html">vscode-sharepoint-workflow-dependency-order</a></li>
+      </ul>
+      <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+      </p>
+    </nav>
+    <main>
+      <article class="markdown-body">
+        <h1 id="vs-code-%E5%8F%96%E4%BB%A3-visual-studio-%E9%96%8B%E7%99%BC-sharepoint%E4%BD%BF%E7%94%A8%E8%80%85%E9%A9%97%E6%94%B6%E6%B8%85%E5%96%AE" tabindex="-1">VS Code 取代 Visual Studio 開發 SharePoint：使用者驗收清單</h1>
+<h2 id="0-%E6%96%87%E4%BB%B6%E7%9B%AE%E7%9A%84" tabindex="-1">0. 文件目的</h2>
+<p>本清單讓 <strong>使用者</strong> 照順序逐項驗證，最終回答這個問題：</p>
+<blockquote>
+<p><strong>能否以藍色 Visual Studio Code 完成 SharePoint Framework 專案的 build / package / deploy / update / retract，不再依賴紫色 Visual Studio？</strong></p>
+</blockquote>
+<p>本清單為 <strong>驗收（UAT）文件</strong>，不是教學手冊。教學操作請看 <a href="./vscode-sharepoint-poc-runbook.html"><code>vscode-sharepoint-poc-runbook.md</code></a>；架構決策請看 <a href="./vscode-sharepoint-dotnet-framework-feasibility.html"><code>vscode-sharepoint-dotnet-framework-feasibility.md</code></a>。</p>
+<h3 id="definition-of-done" tabindex="-1">Definition of Done</h3>
+<p>只有當 <strong>所有 Stage 1～Stage 6 必填項目 <code>[x]</code> 都勾選通過</strong>，且 <a href="#10-%E6%9C%80%E7%B5%82%E9%A9%97%E6%94%B6%E8%81%B2%E6%98%8E">§10 最終驗收聲明</a> 已簽署，才能宣告 VS Code 工作流可正式取代 Visual Studio。</p>
+<p>任何一項 Fail，需於 <a href="#9-%E5%A4%B1%E6%95%97%E5%B0%8D%E7%AD%96%E5%8F%83%E8%80%83%E7%B4%A2%E5%BC%95">§9 失敗對策參考索引</a> 找到對應排查方向，修正後重測。</p>
+<h3 id="%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E6%9C%AC%E6%B8%85%E5%96%AE" tabindex="-1">如何使用本清單</h3>
+<ol>
+<li>依 Stage 順序執行，不要跳關（Stage 4 依賴 Stage 3 通過）。</li>
+<li>每項驗證填寫：勾選 <code>[x]</code> / 日期 / 執行人 / 備註。</li>
+<li>失敗項目於備註欄記錄症狀與修正動作，並重測直到通過。</li>
+<li>全部完成後，在 <a href="#8-%E9%A9%97%E6%94%B6%E7%B4%80%E9%8C%84%E8%A1%A8">§8 驗收紀錄表</a> 與 <a href="#10-%E6%9C%80%E7%B5%82%E9%A9%97%E6%94%B6%E8%81%B2%E6%98%8E">§10 最終驗收聲明</a> 簽署。</li>
+</ol>
+<h3 id="%E7%AF%84%E5%9C%8D%E8%88%87%E6%8E%92%E9%99%A4" tabindex="-1">範圍與排除</h3>
+<table>
+<thead>
+<tr>
+<th>範圍</th>
+<th>在驗收清單內</th>
+<th>不在驗收清單內</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SharePoint Server / Farm Solution（<code>.wsp</code>）</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Feature / Elements / Package XML 編輯</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSBuild build / package / validate</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>PowerShell deploy / update / retract</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>WinForms / WPF Designer</td>
+<td>—</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Razor 視覺化編輯</td>
+<td>—</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>SharePoint Add-in（SPFx / SharePoint Framework with Node）</td>
+<td>—</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="1-stage-0%E9%96%8B%E5%A7%8B%E5%89%8D%E5%BF%85%E8%AE%80" tabindex="-1">1. Stage 0：開始前必讀</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>項目</th>
+<th>確認</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.1</td>
+<td>目標專案是 SharePoint Server / Farm Solution（會產生 <code>.wsp</code>），不是 SPFx（Node-based）</td>
+<td><code>[ x]</code></td>
+</tr>
+<tr>
+<td>0.2</td>
+<td>專案不依賴 WinForms / WPF Designer 與 Razor 視覺化編輯</td>
+<td><code>[x ]</code></td>
+</tr>
+<tr>
+<td>0.3</td>
+<td>已閱讀 <a href="./vscode-sharepoint-dotnet-framework-feasibility.html"><code>vscode-sharepoint-dotnet-framework-feasibility.md</code></a> 「不建議承諾的範圍」一節</td>
+<td><code>[x ]</code></td>
+</tr>
+<tr>
+<td>0.4</td>
+<td>驗收期間，同一份程式碼不會同時被紫色 Visual Studio 部署，避免互相覆蓋</td>
+<td><code>[x ]</code></td>
+</tr>
+</tbody>
+</table>
+<p>任何一項未確認，<strong>請先停止</strong>，與專案負責人對齊範圍。</p>
+<hr>
+<h2 id="2-stage-1%E6%9C%AC%E6%A9%9F%E7%92%B0%E5%A2%83%E9%A9%97%E8%AD%89%E7%84%A1-sharepoint" tabindex="-1">2. Stage 1：本機環境驗證（無 SharePoint）</h2>
+<p>此 Stage 在開發者個人電腦執行，不需 SharePoint Server。</p>
+<p>本 Stage 只列出 <strong>隨個別環境變動才會發生</strong> 的驗證項目；以下兩類事實不重複驗證：</p>
+<ol>
+<li><strong>git 同步後天然成立</strong>：資料夾存在、<code>tasks.json</code> 內容、腳本語法、<code>settings.json</code> 內容。</li>
+<li><strong>Windows 預設安裝就有</strong>：Windows PowerShell 5.1（內建於 Windows 10 / 11 / Server）、<code>cmd.exe</code>、<code>PowerShell ISE</code>。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>VS Code 已安裝</td>
+<td>terminal 執行 <code>code --version</code></td>
+<td>顯示版本號</td>
+<td><code>[x ]</code></td>
+</tr>
+<tr>
+<td>A2</td>
+<td><code>ms-dotnettools.csharp</code> 已安裝</td>
+<td>VS Code Extensions 搜尋 <code>C#</code>，確認發佈者為 Microsoft</td>
+<td>顯示 Installed</td>
+<td><code>[x ]</code></td>
+</tr>
+<tr>
+<td>A3</td>
+<td>C# Dev Kit 未接管</td>
+<td>Extensions 確認 C# Dev Kit 未安裝，或已在本 workspace <code>Disable (Workspace)</code></td>
+<td>不在 Enabled 清單</td>
+<td><code>[x ]</code></td>
+</tr>
+<tr>
+<td>A4</td>
+<td>VS Code 能正確載入 tasks.json</td>
+<td><code>Ctrl+Shift+P</code> → <code>Tasks: Run Task</code></td>
+<td>看到 10 個 <code>SharePoint: *</code> task；無 schema 錯誤提示</td>
+<td><code>[x ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 1 通過條件：</strong> A1～A4 全部 <code>[x]</code>。</p>
+<hr>
+<h2 id="3-stage-2vs-code-%E7%B7%A8%E8%BC%AF%E8%83%BD%E5%8A%9B%E9%A9%97%E8%AD%89%E5%85%AC%E5%8F%B8-sharepoint-%E5%B0%88%E6%A1%88" tabindex="-1">3. Stage 2：VS Code 編輯能力驗證（公司 SharePoint 專案）</h2>
+<p>此 Stage 用 <strong>公司真實 SharePoint 專案</strong> 開啟，驗證 VS Code 編輯體驗是否足夠承接日常工作。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>公司 SharePoint 專案可在 VS Code 開啟</td>
+<td><code>code &lt;公司專案資料夾&gt;</code></td>
+<td>不報錯，OmniSharp output 顯示 <code>Loaded ... project</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B2</td>
+<td>OmniSharp 載入 <code>.csproj</code> / <code>.sln</code></td>
+<td>VS Code 右下角狀態列等候 OmniSharp 完成</td>
+<td>看到 <code>OmniSharp Server running</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B3</td>
+<td>C# IntelliSense 運作</td>
+<td>開任一 <code>.cs</code> 檔，輸入 <code>SPContext.</code></td>
+<td>跳出成員自動完成清單</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B4</td>
+<td>Go to Definition 運作</td>
+<td>在 <code>SPContext.Current</code> 上按 F12</td>
+<td>跳到 metadata 或定義</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B5</td>
+<td>變數 Rename 運作</td>
+<td>對任一 local variable 按 F2 改名</td>
+<td>整檔同名稱同步改名</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B6</td>
+<td>Feature.xml / Elements.xml / Package.xml 有 XML 高亮</td>
+<td>開啟任一 SharePoint XML 檔</td>
+<td>顯示 XML 語法上色與大綱</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B7</td>
+<td>Problems 面板可顯示編譯錯誤</td>
+<td>故意把某 <code>.cs</code> 改成語法錯誤</td>
+<td>Problems 面板出現紅色錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>B8</td>
+<td>編輯後存檔不破壞檔案編碼</td>
+<td>修改一個含中文註解的檔案後存檔，git diff 確認</td>
+<td>無 BOM 或編碼異常</td>
+<td><code>[ ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 2 通過條件：</strong> B1～B8 全部 <code>[x]</code>。</p>
+<p>若 B3 失敗，常見是 C# Dev Kit 干擾或 <code>.vscode/settings.json</code> 中 OmniSharp legacy 設定未生效，回 A3 重檢查並確認 settings.json 已套用。</p>
+<hr>
+<h2 id="4-stage-3%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6%E7%92%B0%E5%A2%83%E9%A9%97%E8%AD%89" tabindex="-1">4. Stage 3：公司電腦環境驗證</h2>
+<p>對應 PoC runbook §1～§3。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td><code>MSBuild.exe</code> 可被找到</td>
+<td><code>&amp; &quot;${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find &quot;MSBuild\**\Bin\MSBuild.exe&quot;</code></td>
+<td>回傳 <code>MSBuild.exe</code> 完整路徑</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C2</td>
+<td>SharePoint targets 可被找到</td>
+<td>搜尋 <code>Microsoft.VisualStudio.SharePoint.targets</code></td>
+<td>至少一筆結果</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C3</td>
+<td>.NET Framework Developer Pack 版本符合專案 Target Framework</td>
+<td>控制台「程式和功能」確認</td>
+<td>版本 ≥ 專案 TargetFrameworkVersion</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C4</td>
+<td>SharePoint snap-in 或 Module 可載入</td>
+<td>Windows PowerShell 5.1 執行 <code>Add-PSSnapin Microsoft.SharePoint.PowerShell</code> 或 <code>Import-Module Microsoft.SharePoint.Powershell</code></td>
+<td>無錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C5</td>
+<td><code>Add-SPSolution</code> cmdlet 可用</td>
+<td><code>Get-Command Add-SPSolution</code></td>
+<td>回傳 cmdlet 資訊</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C6</td>
+<td>執行帳號具部署權限</td>
+<td>執行 <code>Get-SPShellAdmin</code> 後檢視輸出是否包含 <code>$env:USERNAME</code>；或請 Farm Admin 確認</td>
+<td>列表中含目前使用者 / Farm Admin 確認</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C7</td>
+<td>PowerShell Execution Policy 不阻擋</td>
+<td><code>Get-ExecutionPolicy -List</code></td>
+<td>至少有一個 Scope 為 <code>RemoteSigned</code> / <code>Bypass</code> / <code>Unrestricted</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C8</td>
+<td>PowerShell LanguageMode 為 FullLanguage</td>
+<td><code>$ExecutionContext.SessionState.LanguageMode</code></td>
+<td><code>FullLanguage</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>C9</td>
+<td>至少一個專案可成功被 <code>MSBuild.exe &lt;project&gt;.csproj /t:Build</code> 完成</td>
+<td>命令列直接呼叫 MSBuild，不透過 task</td>
+<td>exit code = 0</td>
+<td><code>[ ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 3 通過條件：</strong> C1～C9 全部 <code>[x]</code>。</p>
+<p>C4 / C5 失敗，<strong>不可</strong> 進入 Stage 5；可先做 Stage 4 的 build / package / validate。</p>
+<hr>
+<h2 id="5-stage-4build--package--validate-%E9%A9%97%E8%AD%89%E4%B8%8D%E9%9C%80-sharepoint-runtime" tabindex="-1">5. Stage 4：Build / Package / Validate 驗證（不需 SharePoint runtime）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td><code>SharePoint: Build</code> 成功</td>
+<td>Run Task → <code>SharePoint: Build</code>，帶入 solution 路徑</td>
+<td>exit code 0，無紅色錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>D2</td>
+<td><code>SharePoint: Build (Project)</code> 成功</td>
+<td>Run Task → <code>SharePoint: Build (Project)</code>，帶入 csproj</td>
+<td>exit code 0</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>D3</td>
+<td><code>SharePoint: Package WSP</code> 產生 <code>.wsp</code></td>
+<td>Run Task → <code>SharePoint: Package WSP</code></td>
+<td><code>bin\&lt;Config&gt;\&lt;Project&gt;.wsp</code> 存在</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>D4</td>
+<td><code>.wsp</code> 內容正確</td>
+<td>將 <code>.wsp</code> 改副檔名為 <code>.cab</code> 或用 7-Zip 開啟</td>
+<td>看到 <code>manifest.xml</code>、Feature 資料夾</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>D5</td>
+<td><code>SharePoint: Validate Package</code> 無 error</td>
+<td>Run Task → <code>SharePoint: Validate Package</code></td>
+<td>exit code 0，Output 無 SPDisp/SPPkg error</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>D6</td>
+<td>與 Visual Studio 產生的 <code>.wsp</code> 一致</td>
+<td>（選測）用紫色 VS 對同 commit 打包，比對 manifest.xml</td>
+<td>結構等價（GUID 順序可不同）</td>
+<td><code>[ ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 4 通過條件：</strong> D1～D5 必填全部 <code>[x]</code>；D6 為選測（建議至少一次）。</p>
+<hr>
+<h2 id="6-stage-5deploy--update--retract-%E9%A9%97%E8%AD%89%E5%85%AC%E5%8F%B8-sharepoint-server" tabindex="-1">6. Stage 5：Deploy / Update / Retract 驗證（公司 SharePoint Server）</h2>
+<p>⚠️ 本 Stage 會 <strong>變更 SharePoint Server 狀態</strong>。建議於 <strong>測試 farm</strong> 或 <strong>獨立測試 Web Application</strong> 執行，不要直接打 Production。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td><code>SharePoint: Deploy WSP</code> 成功</td>
+<td>Run Task → <code>SharePoint: Deploy WSP</code>，帶入 wsp 路徑與 Web App URL</td>
+<td>task 結束 exit code 0，無 PowerShell 紅字</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td>Central Administration 顯示 Deployed</td>
+<td>CA → System Settings → Manage farm solutions</td>
+<td>該 solution 狀態為 <code>Deployed</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E3</td>
+<td>Feature 可啟用 / 站台行為正常</td>
+<td>Site Settings → Site features，啟用對應 Feature 後操作站台</td>
+<td>Feature 啟用成功，站台無 500 / Correlation ID 錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E4</td>
+<td>ULS log 無關鍵錯誤</td>
+<td><code>Merge-SPLogFile -Path &quot;deploy.log&quot; -StartTime (Get-Date).AddMinutes(-10)</code> 後檢視</td>
+<td>無 <code>Unexpected</code> 等級之部署相關錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E5</td>
+<td><code>SharePoint: Update WSP</code> 成功</td>
+<td>修改某 cs 檔 → Package → Run Task <code>SharePoint: Update WSP</code></td>
+<td>exit code 0，站台行為反映新版</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td><code>SharePoint: Retract WSP</code> 成功</td>
+<td>Run Task → <code>SharePoint: Retract WSP</code>，帶入 solution 名稱與 Web App URL</td>
+<td>CA 中 solution 狀態變為 <code>Not Deployed</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E7</td>
+<td>Retract + Remove from Farm 乾淨</td>
+<td>Run Task → <code>SharePoint: Retract WSP (All Web Apps + Remove from Farm)</code></td>
+<td>CA 中該 solution 完全消失</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>E8</td>
+<td>移除後重新 Deploy 不殘留</td>
+<td>重跑 <code>SharePoint: Deploy WSP</code></td>
+<td>部署成功且無「solution already exists」之類錯誤</td>
+<td><code>[ ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 5 通過條件：</strong> E1～E8 全部 <code>[x]</code>。</p>
+<hr>
+<h2 id="7-stage-6%E5%8F%96%E4%BB%A3-visual-studio-%E6%95%B4%E9%AB%94%E9%A9%97%E6%94%B6" tabindex="-1">7. Stage 6：取代 Visual Studio 整體驗收</h2>
+<p>此 Stage 是「最終假設驗證」：藍色 VS Code 真的能取代紫色 Visual Studio 嗎？</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>驗證項目</th>
+<th>執行步驟</th>
+<th>預期結果</th>
+<th>勾選</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>整輪流程未啟動 <code>devenv.exe</code></td>
+<td>從 Stage 4 起，全程透過工作管理員確認 devenv.exe 未啟動</td>
+<td>工作管理員無 <code>devenv.exe</code> 處理程序</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F2</td>
+<td>不依賴 Visual Studio Designer</td>
+<td>過程中未使用 Package Designer / Feature Designer / Server Explorer UI</td>
+<td>無</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F3</td>
+<td>重複跑 Build → Package → Validate 三次穩定</td>
+<td>連續執行三次，結果一致、<code>.wsp</code> 大小與內容相同（時間戳除外）</td>
+<td>三次皆通過、可重現</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F4</td>
+<td>重複跑 Deploy → Update → Retract 三輪穩定</td>
+<td>同上</td>
+<td>三輪皆通過</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F5</td>
+<td>第二人獨立完成 PoC</td>
+<td>同事或不同帳號照本清單從 Stage 1 重做一次</td>
+<td>全部 <code>[x]</code></td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F6</td>
+<td>已知失敗點都能照 §9 排查</td>
+<td>任一 Fail 都能對應到 PoC runbook §6 的處理</td>
+<td>無「無法解決」狀態</td>
+<td><code>[ ]</code></td>
+</tr>
+<tr>
+<td>F7</td>
+<td>與紫色 VS 的差異紀錄完成</td>
+<td>列出本清單未涵蓋、仍需要紫色 VS 的場景（若有）</td>
+<td>差異清單已存檔</td>
+<td><code>[ ]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stage 6 通過條件：</strong> F1～F6 必填全部 <code>[x]</code>；F7 視專案而定，若無差異則註明「無」。</p>
+<hr>
+<h2 id="8-%E9%A9%97%E6%94%B6%E7%B4%80%E9%8C%84%E8%A1%A8" tabindex="-1">8. 驗收紀錄表</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>通過日期</th>
+<th>執行人</th>
+<th>環境（本機 / 公司測試 / 公司 Prod）</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 本機環境</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2. VS Code 編輯能力</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3. 公司電腦環境</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4. Build / Package / Validate</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5. Deploy / Update / Retract</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6. 整體取代驗收</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="9-%E5%A4%B1%E6%95%97%E5%B0%8D%E7%AD%96%E5%8F%83%E8%80%83%E7%B4%A2%E5%BC%95" tabindex="-1">9. 失敗對策參考索引</h2>
+<table>
+<thead>
+<tr>
+<th>Stage / 項目</th>
+<th>常見症狀</th>
+<th>對應參考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A2、A3、B2、B3</td>
+<td>IntelliSense 不出、無法跳轉</td>
+<td><code>vscode-sharepoint-dotnet-framework-feasibility.md</code> §「建議 VS Code workspace 設定」</td>
+</tr>
+<tr>
+<td>C4、C5</td>
+<td>PowerShell snap-in 找不到</td>
+<td><code>vscode-sharepoint-poc-runbook.md</code> §3</td>
+</tr>
+<tr>
+<td>C1、C2、C9、D1</td>
+<td>MSBuild 找不到 / SharePoint targets 缺失</td>
+<td><code>vscode-sharepoint-poc-runbook.md</code> §2</td>
+</tr>
+<tr>
+<td>C6、C7、C8</td>
+<td>部署權限 / Execution Policy / ConstrainedLanguage</td>
+<td><code>vscode-sharepoint-poc-runbook.md</code> §3.4、§3.5</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>Validate Package 報錯</td>
+<td><code>vscode-sharepoint-poc-runbook.md</code> §6（reference assemblies / SharePoint targets 列）</td>
+</tr>
+<tr>
+<td>E1～E8</td>
+<td>Deploy 後狀態異常 / Update 沒生效 / Retract 殘留</td>
+<td><code>vscode-sharepoint-poc-runbook.md</code> §6（Deploy/Update/Retract 列）</td>
+</tr>
+<tr>
+<td>F3、F4</td>
+<td>不可重現</td>
+<td>回 PoC runbook §6 + 紀錄 ULS log，回填至依賴順序文件 §9「修正與模板化」</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="10-%E6%9C%80%E7%B5%82%E9%A9%97%E6%94%B6%E8%81%B2%E6%98%8E" tabindex="-1">10. 最終驗收聲明</h2>
+<p>當以下條件全數成立時，本驗收完成：</p>
+<ul>
+<li>[ ] Stage 1 通過（A1～A4 全 <code>[x]</code>）。</li>
+<li>[ ] Stage 2 通過（B1～B8 全 <code>[x]</code>）。</li>
+<li>[ ] Stage 3 通過（C1～C9 全 <code>[x]</code>）。</li>
+<li>[ ] Stage 4 通過（D1～D5 全 <code>[x]</code>，D6 已紀錄結果）。</li>
+<li>[ ] Stage 5 通過（E1～E8 全 <code>[x]</code>）。</li>
+<li>[ ] Stage 6 通過（F1～F6 全 <code>[x]</code>，F7 已紀錄差異）。</li>
+</ul>
+<p>驗收結論：</p>
+<blockquote>
+<p>本人確認：在公司電腦與公司 SharePoint Server 環境下，藍色 Visual Studio Code 透過本 repo 的 <code>scripts/</code> 與 <code>.vscode/tasks.json</code> 工作流，<strong>已可完整承接</strong> SharePoint Server / <code>.NET Framework</code> 專案的編輯、build、package、validate、deploy、update、retract 流程，<strong>不再需要紫色 Visual Studio</strong> 作為日常 IDE。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>姓名</th>
+<th>簽署日期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>驗收人</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第二驗收人（F5 對象）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>專案負責人</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%E9%99%84%E9%8C%84%E6%9C%AC%E9%A9%97%E6%94%B6%E6%B8%85%E5%96%AE%E8%88%87%E7%9B%B8%E9%97%9C%E6%96%87%E4%BB%B6%E5%B0%8D%E6%87%89" tabindex="-1">附錄：本驗收清單與相關文件對應</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./framework.html"><code>framework.md</code></a></td>
+<td>原始需求與問題</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-dotnet-framework-feasibility.html"><code>vscode-sharepoint-dotnet-framework-feasibility.md</code></a></td>
+<td>可行性評估（決策依據）</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-workflow-dependency-order.html"><code>vscode-sharepoint-workflow-dependency-order.md</code></a></td>
+<td>工作流依賴順序與交接任務表</td>
+</tr>
+<tr>
+<td><a href="./vscode-sharepoint-poc-runbook.html"><code>vscode-sharepoint-poc-runbook.md</code></a></td>
+<td>公司電腦 PoC 操作手冊（教 <strong>怎麼操作</strong>）</td>
+</tr>
+<tr>
+<td><strong><code>vscode-sharepoint-acceptance-checklist.md</code>（本文件）</strong></td>
+<td>使用者驗收清單（驗 <strong>能不能取代 VS</strong>）</td>
+</tr>
+</tbody>
+</table>
+
+        <div class="doc-footer">
+          原始檔：<code>docs/vscode-sharepoint-acceptance-checklist.md</code> · 產生時間：2026-05-17 09:47:57 UTC
+        </div>
+      </article>
+    </main>
+  </div>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js"></script>
+  <script>
+    if (window.hljs) {
+      document.querySelectorAll('pre code').forEach((block) => {
+        if (!block.parentElement.classList.contains('mermaid')) {
+          hljs.highlightElement(block);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

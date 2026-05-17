@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code SharePoint 工作流依賴步驟順序</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    nav.sidebar {
+      background: #fff;
+      border-right: 1px solid #d1d9e0;
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav.sidebar h2 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #59636e;
+      margin: 0 0 12px;
+      padding: 0 10px;
+    }
+    nav.sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+    nav.sidebar li {
+      margin: 2px 0;
+    }
+    nav.sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #1f2328;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    nav.sidebar a:hover {
+      background: #eaeef2;
+    }
+    nav.sidebar li.active > a {
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 600;
+    }
+    main {
+      padding: 32px 48px;
+      background: #fff;
+      min-width: 0;
+    }
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 100%;
+    }
+    .markdown-body pre.mermaid {
+      background: #f6f8fa;
+      padding: 16px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .markdown-body pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      main { padding: 16px; }
+    }
+    .doc-footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #d1d9e0;
+      font-size: 12px;
+      color: #59636e;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <h2>docs/</h2>
+      <ul>
+                <li><a href="README.html">README</a></li>
+        <li><a href="framework.html">framework</a></li>
+        <li><a href="omnisharp-server-reference.html">omnisharp-server-reference</a></li>
+        <li><a href="vscode-sharepoint-acceptance-checklist.html">vscode-sharepoint-acceptance-checklist</a></li>
+        <li><a href="vscode-sharepoint-dotnet-framework-feasibility.html">vscode-sharepoint-dotnet-framework-feasibility</a></li>
+        <li><a href="vscode-sharepoint-poc-runbook.html">vscode-sharepoint-poc-runbook</a></li>
+        <li class="active"><a href="#">vscode-sharepoint-workflow-dependency-order</a></li>
+      </ul>
+      <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+      </p>
+    </nav>
+    <main>
+      <article class="markdown-body">
+        <h1 id="vs-code-sharepoint-%E5%B7%A5%E4%BD%9C%E6%B5%81%E4%BE%9D%E8%B3%B4%E6%AD%A5%E9%A9%9F%E9%A0%86%E5%BA%8F" tabindex="-1">VS Code SharePoint 工作流依賴步驟順序</h1>
+<h2 id="%E7%9B%AE%E7%9A%84" tabindex="-1">目的</h2>
+<p>本文件記錄從「可行性評估」推進到「公司 SharePoint 環境實測」之前的依賴順序。</p>
+<p>目前限制是本機沒有 Windows Server / SharePoint Server 環境，因此不在本機驗證 SharePoint 是否可建置、打包或部署。現階段只先產出可攜式工作流模板與操作規格，等到公司電腦或公司伺服器環境再進行 PoC 驗證。</p>
+<h2 id="%E6%B1%BA%E7%AD%96%E5%89%8D%E6%8F%90" tabindex="-1">決策前提</h2>
+<ol>
+<li>主要目標是保留 VS Code 輕量工作流。</li>
+<li>目標專案是 SharePoint Server / <code>.NET Framework</code> 專案。</li>
+<li>需要支援 build、package <code>.wsp</code>、deploy、update、retract。</li>
+<li>不需要 WinForms、WPF、Razor 或其他視覺化 Designer。</li>
+<li>本機不驗證 SharePoint runtime，SharePoint 相關驗證移到公司電腦執行。</li>
+<li>優先建立命令列與 VS Code tasks 流程，不優先開發 VS Code extension。</li>
+<li>不預設公司電腦已具備 SharePoint PowerShell；安裝或確認 SharePoint PowerShell 可用是公司端前置步驟。</li>
+</ol>
+<h2 id="%E4%BE%9D%E8%B3%B4%E9%A0%86%E5%BA%8F%E7%B8%BD%E8%A6%BD" tabindex="-1">依賴順序總覽</h2>
+<pre class="mermaid">flowchart TD
+    A[確認目標工作流] --&gt; B[設計可攜式參數]
+    B --&gt; C[建立 scripts 模板]
+    C --&gt; D[建立 VS Code tasks]
+    D --&gt; E[撰寫操作文件]
+    E --&gt; F[帶到公司電腦設定環境]
+    F --&gt; G[安裝或確認 SharePoint PowerShell]
+    G --&gt; H[使用真實 SharePoint 專案 PoC]
+    H --&gt; I{PoC 是否穩定}
+    I --&gt;|是| J[整理共用模板]
+    I --&gt;|否| K[修正 scripts 與 tasks]
+    K --&gt; H
+    J --&gt; L[評估是否開發 VS Code extension]
+</pre>
+<h2 id="%E6%AD%A5%E9%A9%9F-1%E7%A2%BA%E8%AA%8D%E7%9B%AE%E6%A8%99%E5%B7%A5%E4%BD%9C%E6%B5%81" tabindex="-1">步驟 1：確認目標工作流</h2>
+<p>執行位置：本機。</p>
+<p>目的：先定義 VS Code 要承接哪些操作，避免把範圍擴大成完整 Visual Studio 替代品。</p>
+<p>輸出：</p>
+<ol>
+<li>VS Code 負責編輯。</li>
+<li>MSBuild 負責 build。</li>
+<li>MSBuild target 負責 package <code>.wsp</code>。</li>
+<li>PowerShell / SharePoint Management Shell 負責 deploy、update、retract。</li>
+<li>VS Code tasks 負責把常用命令整合成可執行任務。</li>
+</ol>
+<p>此步驟完成後，才能進入參數設計。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-2%E8%A8%AD%E8%A8%88%E5%8F%AF%E6%94%9C%E5%BC%8F%E5%8F%83%E6%95%B8" tabindex="-1">步驟 2：設計可攜式參數</h2>
+<p>執行位置：本機。</p>
+<p>目的：避免腳本硬編碼公司電腦路徑、伺服器 URL 或專案名稱。</p>
+<p>建議參數：</p>
+<ol>
+<li><code>SolutionPath</code></li>
+<li><code>ProjectPath</code></li>
+<li><code>Configuration</code></li>
+<li><code>Platform</code></li>
+<li><code>MsBuildPath</code></li>
+<li><code>PackageOutputPath</code></li>
+<li><code>WspPath</code></li>
+<li><code>SolutionName</code></li>
+<li><code>WebApplicationUrl</code></li>
+<li><code>DeployToGac</code></li>
+<li><code>Force</code></li>
+</ol>
+<p>此步驟完成後，才能開始建立 scripts 模板。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-3%E5%BB%BA%E7%AB%8B-scripts-%E6%A8%A1%E6%9D%BF" tabindex="-1">步驟 3：建立 scripts 模板</h2>
+<p>執行位置：本機。</p>
+<p>目的：先把 SharePoint 工作流拆成可重複執行的 PowerShell 腳本。這些腳本在本機只做語法與參數設計，不驗證 SharePoint 實際行為。</p>
+<p>建議檔案：</p>
+<pre><code class="language-text">scripts/
+  build.ps1
+  package.ps1
+  validate-package.ps1
+  deploy-wsp.ps1
+  update-wsp.ps1
+  retract-wsp.ps1
+</code></pre>
+<p>腳本職責：</p>
+<ol>
+<li><code>build.ps1</code>：呼叫 MSBuild 執行專案或 solution build。</li>
+<li><code>package.ps1</code>：呼叫 MSBuild <code>/t:Package</code> 產生 <code>.wsp</code>。</li>
+<li><code>validate-package.ps1</code>：呼叫 MSBuild <code>/t:ValidatePackage</code> 驗證 package。</li>
+<li><code>deploy-wsp.ps1</code>：呼叫 SharePoint PowerShell 新增與安裝 solution。</li>
+<li><code>update-wsp.ps1</code>：呼叫 SharePoint PowerShell 更新既有 solution。</li>
+<li><code>retract-wsp.ps1</code>：呼叫 SharePoint PowerShell 解除安裝與移除 solution。</li>
+</ol>
+<p>此步驟完成後，才能建立 VS Code tasks。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-4%E5%BB%BA%E7%AB%8B-vs-code-tasks" tabindex="-1">步驟 4：建立 VS Code tasks</h2>
+<p>執行位置：本機。</p>
+<p>目的：讓 VS Code 可透過 command palette 或 task runner 執行 scripts。</p>
+<p>建議檔案：</p>
+<pre><code class="language-text">.vscode/
+  settings.json
+  tasks.json
+</code></pre>
+<p>建議 tasks：</p>
+<ol>
+<li><code>SharePoint: Build</code></li>
+<li><code>SharePoint: Package WSP</code></li>
+<li><code>SharePoint: Validate Package</code></li>
+<li><code>SharePoint: Deploy WSP</code></li>
+<li><code>SharePoint: Update WSP</code></li>
+<li><code>SharePoint: Retract WSP</code></li>
+</ol>
+<p>此步驟依賴 scripts 模板，因為 tasks 只負責呼叫腳本，不直接承擔部署邏輯。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-5%E6%92%B0%E5%AF%AB%E6%93%8D%E4%BD%9C%E6%96%87%E4%BB%B6" tabindex="-1">步驟 5：撰寫操作文件</h2>
+<p>執行位置：本機。</p>
+<p>目的：讓公司電腦驗證時可以照文件準備環境與執行 PoC。</p>
+<p>操作文件需包含：</p>
+<ol>
+<li>必要工具清單。</li>
+<li>VS Code extension 建議。</li>
+<li><code>.NET Framework Developer Pack</code> 版本對應方式。</li>
+<li><code>MSBuild.exe</code> 尋找方式。</li>
+<li>SharePoint PowerShell / SharePoint Management Shell 安裝或啟用步驟。</li>
+<li>部署帳號權限前提。</li>
+<li>第一次 PoC 的執行順序。</li>
+<li>常見失敗點與排查方向。</li>
+</ol>
+<p>此步驟完成後，才適合切到公司電腦進行驗證。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-6%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6%E5%9F%BA%E7%A4%8E%E7%92%B0%E5%A2%83%E8%A8%AD%E5%AE%9A" tabindex="-1">步驟 6：公司電腦基礎環境設定</h2>
+<p>執行位置：公司電腦或可連到 SharePoint Server 的環境。</p>
+<p>目的：確認公司電腦具備實際建置與打包 SharePoint solution 的條件。SharePoint PowerShell 不在此步驟假設已存在，需於下一步明確安裝或確認。</p>
+<p>需確認：</p>
+<ol>
+<li><code>MSBuild.exe</code> 可用。</li>
+<li>目標 <code>.NET Framework Developer Pack</code> 已安裝。</li>
+<li>SharePoint project targets / assemblies 可被找到。</li>
+<li>真實專案可在不開 Visual Studio 的情況下被命令列建置。</li>
+</ol>
+<p>此步驟完成後，才能進入 SharePoint PowerShell 前置設定。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-7%E5%AE%89%E8%A3%9D%E6%88%96%E7%A2%BA%E8%AA%8D-sharepoint-powershell" tabindex="-1">步驟 7：安裝或確認 SharePoint PowerShell</h2>
+<p>執行位置：公司電腦或可連到 SharePoint Server 的環境。</p>
+<p>目的：把 SharePoint solution 部署能力當成明確前置依賴，而不是隱含假設。</p>
+<p>需確認：</p>
+<ol>
+<li>SharePoint PowerShell / SharePoint Management Shell 已安裝或可啟用。</li>
+<li>PowerShell 可以載入 SharePoint 管理指令所需 module、snap-in 或管理工具。</li>
+<li>可執行 solution 部署相關 cmdlet，例如 <code>Add-SPSolution</code>、<code>Install-SPSolution</code>、<code>Update-SPSolution</code>、<code>Uninstall-SPSolution</code>、<code>Remove-SPSolution</code>。</li>
+<li>執行者具有部署 solution 的權限。</li>
+<li>PowerShell execution policy 不會阻擋專案 scripts 執行。</li>
+</ol>
+<p>此步驟完成後，才能進入真實專案 PoC。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-8%E7%9C%9F%E5%AF%A6-sharepoint-%E5%B0%88%E6%A1%88-poc" tabindex="-1">步驟 8：真實 SharePoint 專案 PoC</h2>
+<p>執行位置：公司電腦或可連到 SharePoint Server 的環境。</p>
+<p>目的：用公司真實專案驗證 VS Code 工作流是否成立。</p>
+<p>建議順序：</p>
+<ol>
+<li>在 VS Code 開啟專案。</li>
+<li>執行 <code>SharePoint: Build</code>。</li>
+<li>執行 <code>SharePoint: Package WSP</code>。</li>
+<li>執行 <code>SharePoint: Validate Package</code>。</li>
+<li>執行 <code>SharePoint: Deploy WSP</code> 或 <code>SharePoint: Update WSP</code>。</li>
+<li>到 SharePoint Server 確認 solution 與 feature 狀態。</li>
+</ol>
+<p>成功標準：</p>
+<ol>
+<li>不開紫色 Visual Studio 也能完成 build。</li>
+<li>不開紫色 Visual Studio 也能產生 <code>.wsp</code>。</li>
+<li>不開紫色 Visual Studio 也能部署或更新 solution。</li>
+<li>部署結果可在 SharePoint Server 上被確認。</li>
+</ol>
+<h2 id="%E6%AD%A5%E9%A9%9F-9%E4%BF%AE%E6%AD%A3%E8%88%87%E6%A8%A1%E6%9D%BF%E5%8C%96" tabindex="-1">步驟 9：修正與模板化</h2>
+<p>執行位置：本機與公司電腦都可能需要。</p>
+<p>目的：根據 PoC 結果修正 scripts、tasks 與文件。</p>
+<p>常見調整：</p>
+<ol>
+<li>補上公司專案特有的 MSBuild property。</li>
+<li>補上 SharePoint solution 更新前後的等待與狀態檢查。</li>
+<li>補上 IIS reset 或服務重啟策略。</li>
+<li>補上 Feature activation / deactivation 步驟。</li>
+<li>補上錯誤訊息與 exit code 處理。</li>
+</ol>
+<p>此步驟需反覆執行，直到流程穩定。</p>
+<h2 id="%E6%AD%A5%E9%A9%9F-10%E8%A9%95%E4%BC%B0-vs-code-extension" tabindex="-1">步驟 10：評估 VS Code extension</h2>
+<p>執行位置：本機。</p>
+<p>前提：只有在 scripts 與 tasks 已穩定後才評估 extension。</p>
+<p>extension 可做的事：</p>
+<ol>
+<li>提供 Command Palette 指令。</li>
+<li>提供側邊欄按鈕。</li>
+<li>顯示目前 project / solution / WSP 設定。</li>
+<li>呼叫既有 PowerShell scripts。</li>
+<li>顯示 build / package / deploy 結果。</li>
+</ol>
+<p>extension 不應做的事：</p>
+<ol>
+<li>不直接重寫 SharePoint 部署邏輯。</li>
+<li>不重做 Visual Studio Designer。</li>
+<li>不把公司環境路徑硬編碼在 extension 內。</li>
+</ol>
+<h2 id="%E7%9B%AE%E5%89%8D%E4%B8%8B%E4%B8%80%E6%AD%A5" tabindex="-1">目前下一步</h2>
+<p>目前應先執行：</p>
+<ol>
+<li><s>建立 scripts 模板。</s>（已完成）</li>
+<li><s>建立 VS Code tasks 模板。</s>（已完成）</li>
+<li><s>撰寫公司電腦 PoC 操作文件。</s>（已完成，見 <code>docs/vscode-sharepoint-poc-runbook.md</code>）</li>
+<li><s>在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。</s>（已併入 PoC 手冊 §3）</li>
+</ol>
+<p>剩餘任務 4 為 <code>[blocked]</code>，需到公司電腦或可連到 SharePoint Server 的環境執行實測，本機無法繼續推進。</p>
+<p>到公司電腦執行 PoC 時，請使用 <a href="./vscode-sharepoint-acceptance-checklist.html"><code>vscode-sharepoint-acceptance-checklist.md</code></a> 逐項打勾驗收，該文件設計為 UAT 清單，最終目標是回答「藍色 VS Code 能否取代紫色 Visual Studio 開發 SharePoint」。</p>
+<h2 id="%E6%98%8E%E7%A2%BA%E5%9F%B7%E8%A1%8C%E6%B8%85%E5%96%AE" tabindex="-1">明確執行清單</h2>
+<p>狀態定義：</p>
+<ul>
+<li><code>[x]</code> 已完成，可供後續工具直接使用。</li>
+<li><code>[ ]</code> 尚未完成，是下一個可執行工作。</li>
+<li><code>[blocked]</code> 需等待公司電腦或 SharePoint Server 環境。</li>
+</ul>
+<h3 id="%E4%BA%A4%E6%8E%A5%E4%BB%BB%E5%8B%99%E8%A1%A8" tabindex="-1">交接任務表</h3>
+<table>
+<thead>
+<tr>
+<th>順序</th>
+<th>狀態</th>
+<th>任務</th>
+<th>輸出</th>
+<th>接手說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>[x]</code></td>
+<td>建立 <code>scripts/</code> 模板</td>
+<td><code>scripts/*.ps1</code></td>
+<td>已完成六個 PowerShell 腳本模板，後續可直接被 <code>.vscode/tasks.json</code> 呼叫。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>[x]</code></td>
+<td>建立 <code>.vscode/tasks.json</code></td>
+<td><code>.vscode/tasks.json</code>、<code>.vscode/settings.json</code></td>
+<td>已建立十個 VS Code tasks（六個規格 task 加上 <code>Build (Project)</code>、<code>Deploy WSP (All Web Apps)</code>、<code>Retract WSP (All Web Apps)</code>、<code>Retract WSP (All Web Apps + Remove from Farm)</code> 等變體）與 OmniSharp legacy 設定，全部透過 <code>${input:*}</code> 提示輸入，不硬編碼公司路徑。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>[x]</code></td>
+<td>補公司電腦 PoC 操作文件</td>
+<td><code>docs/vscode-sharepoint-poc-runbook.md</code></td>
+<td>已撰寫 8 章節 PoC 手冊：必要工具、MSBuild 尋找、SharePoint PowerShell 載入、修改參數三種方式、第一次 PoC 執行順序、常見失敗點對照表、完成標準、本機限制。</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>[blocked]</code></td>
+<td>到公司電腦或 SharePoint Server 環境實測</td>
+<td>PoC 結果與修正紀錄</td>
+<td>本機不執行 SharePoint 實測，需等公司環境具備 SharePoint PowerShell、MSBuild 與真實專案。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-x-%E5%85%88%E5%BB%BA%E7%AB%8B-scripts-%E6%A8%A1%E6%9D%BF" tabindex="-1">1. <code>[x]</code> 先建立 <code>scripts/</code> 模板</h3>
+<p>完成檔案：</p>
+<ul>
+<li>[x] <code>scripts/build.ps1</code></li>
+<li>[x] <code>scripts/package.ps1</code></li>
+<li>[x] <code>scripts/validate-package.ps1</code></li>
+<li>[x] <code>scripts/deploy-wsp.ps1</code></li>
+<li>[x] <code>scripts/update-wsp.ps1</code></li>
+<li>[x] <code>scripts/retract-wsp.ps1</code></li>
+</ul>
+<p>完成標準：</p>
+<ul>
+<li>[x] 六個腳本檔案已建立。</li>
+<li>[x] 腳本採參數化設計，不硬編碼公司電腦路徑。</li>
+<li>[x] build / package / validate 由 MSBuild 負責。</li>
+<li>[x] deploy / update / retract 由 SharePoint PowerShell 負責。</li>
+<li>[x] SharePoint PowerShell 不存在時會回報明確錯誤。</li>
+<li>[x] 已用 PowerShell parser 做語法檢查。</li>
+</ul>
+<p>後續依賴：</p>
+<ul>
+<li><code>.vscode/tasks.json</code> 應直接呼叫這六個腳本，不應重新實作 build 或部署邏輯。</li>
+</ul>
+<h3 id="2-x-%E5%B7%B2%E5%BB%BA%E7%AB%8B-vscodetasks-json" tabindex="-1">2. <code>[x]</code> 已建立 <code>.vscode/tasks.json</code></h3>
+<p>完成檔案：</p>
+<ul>
+<li>[x] <code>.vscode/tasks.json</code></li>
+<li>[x] <code>.vscode/settings.json</code>（啟用 OmniSharp legacy、固定 PowerShell 為預設 terminal）</li>
+</ul>
+<p>已建立 tasks：</p>
+<p>規格要求的六個 task：</p>
+<ul>
+<li>[x] <code>SharePoint: Build</code>（以 <code>-SolutionPath</code> 建置 solution，預設 build group）</li>
+<li>[x] <code>SharePoint: Package WSP</code></li>
+<li>[x] <code>SharePoint: Validate Package</code></li>
+<li>[x] <code>SharePoint: Deploy WSP</code>（指定 <code>-WebApplicationUrl</code>）</li>
+<li>[x] <code>SharePoint: Update WSP</code></li>
+<li>[x] <code>SharePoint: Retract WSP</code>（指定 <code>-WebApplicationUrl</code>）</li>
+</ul>
+<p>延伸 variant（為了暴露腳本中的互斥分支與常見變化，避免使用者手動改 task）：</p>
+<ul>
+<li>[x] <code>SharePoint: Build (Project)</code>：當沒有 <code>.sln</code> 或只想建單一專案時使用 <code>-ProjectPath</code>。</li>
+<li>[x] <code>SharePoint: Deploy WSP (All Web Apps)</code>：傳遞 <code>-AllWebApplications</code>，與 <code>-WebApplicationUrl</code> 互斥。</li>
+<li>[x] <code>SharePoint: Retract WSP (All Web Apps)</code>：對所有 Web Application 解除安裝。</li>
+<li>[x] <code>SharePoint: Retract WSP (All Web Apps + Remove from Farm)</code>：Uninstall + Remove 一次完成。</li>
+</ul>
+<p>完成標準：</p>
+<ul>
+<li>[x] 每個 task 都呼叫對應的 <code>scripts/*.ps1</code>。</li>
+<li>[x] task 參數透過 <code>inputs</code> 提示輸入，使用 <code>${workspaceFolder}</code> 與 <code>${input:*}</code>，不硬編碼公司路徑。</li>
+<li>[x] build / package / validate task 可在本機檢查參數結構，但不要求本機具備 SharePoint。</li>
+<li>[x] deploy / update / retract task 在 <code>detail</code> 中明確標示 <code>[需公司電腦/SharePoint Server 環境]</code>。</li>
+<li>[x] JSON 語法已用 PowerShell <code>ConvertFrom-Json</code> 驗證通過。</li>
+</ul>
+<h3 id="3-x-%E5%B7%B2%E8%A3%9C%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6-poc-%E6%93%8D%E4%BD%9C%E6%96%87%E4%BB%B6" tabindex="-1">3. <code>[x]</code> 已補公司電腦 PoC 操作文件</h3>
+<p>完成檔案：</p>
+<ul>
+<li>[x] <code>docs/vscode-sharepoint-poc-runbook.md</code></li>
+</ul>
+<p>已記錄內容：</p>
+<ul>
+<li>[x] §1 必要工具清單（VS Code、C# extension、.NET Framework Developer Pack、MSBuild、SharePoint Server、Windows PowerShell 5.1）。</li>
+<li>[x] §2 確認 <code>MSBuild.exe</code>（vswhere 尋找、PATH 設定三種方式、SharePoint targets 驗證）。</li>
+<li>[x] §3 安裝或啟用 SharePoint PowerShell / SharePoint Management Shell（snap-in、Module、權限、Execution Policy）。</li>
+<li>[x] §4 修改腳本參數（task default、Command Palette 輸入、terminal 直呼三種方式）。</li>
+<li>[x] §5 第一次 PoC 執行順序與 SharePoint 端確認項目。</li>
+<li>[x] §6 常見失敗點與排查方向（MSBuild、reference assemblies、PowerShell、Deploy/Update/Retract 各類錯誤對照表）。</li>
+</ul>
+<p>完成標準：</p>
+<ul>
+<li>[x] 文件可讓公司電腦使用者按順序完成前置檢查。</li>
+<li>[x] 文件列出第一次 PoC 的建議命令（task 名稱與等同 PowerShell 指令並列）。</li>
+<li>[x] 文件列出常見失敗點與排查方向（§6 對照表）。</li>
+<li>[x] 文件明確說明本機不做 SharePoint 實測（§8 本機限制與不執行項目）。</li>
+</ul>
+<h3 id="4-blocked-%E7%AD%89%E5%88%B0%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6%E6%88%96-sharepoint-server-%E7%92%B0%E5%A2%83%E5%86%8D%E5%AF%A6%E6%B8%AC" tabindex="-1">4. <code>[blocked]</code> 等到公司電腦或 SharePoint Server 環境再實測</h3>
+<p>等待原因：</p>
+<ul>
+<li>本機沒有 Windows Server / SharePoint Server 環境。</li>
+<li>本機不應假設 SharePoint PowerShell 已存在。</li>
+<li>真實 build / package / deploy 需要公司專案與公司 SharePoint 環境。</li>
+</ul>
+<p>成功標準：</p>
+<ul>
+<li>[ ] 不開紫色 Visual Studio 能 build。</li>
+<li>[ ] 能產生 <code>.wsp</code>。</li>
+<li>[ ] 能透過 PowerShell deploy / update / retract。</li>
+<li>[ ] 部署結果可在 SharePoint Server 上被確認。</li>
+</ul>
+<p>暫不執行：</p>
+<ol>
+<li>本機 SharePoint 環境檢查。</li>
+<li>本機 SharePoint build/package/deploy 驗證。</li>
+<li>VS Code extension 開發。</li>
+</ol>
+
+        <div class="doc-footer">
+          原始檔：<code>docs/vscode-sharepoint-workflow-dependency-order.md</code> · 產生時間：2026-05-17 09:47:57 UTC
+        </div>
+      </article>
+    </main>
+  </div>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js"></script>
+  <script>
+    if (window.hljs) {
+      document.querySelectorAll('pre code').forEach((block) => {
+        if (!block.parentElement.classList.contains('mermaid')) {
+          hljs.highlightElement(block);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
