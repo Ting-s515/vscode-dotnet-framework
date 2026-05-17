@@ -240,8 +240,10 @@ extension 不應做的事：
 
 1. ~~建立 scripts 模板。~~（已完成）
 2. ~~建立 VS Code tasks 模板。~~（已完成）
-3. 撰寫公司電腦 PoC 操作文件。
-4. 在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。
+3. ~~撰寫公司電腦 PoC 操作文件。~~（已完成，見 `docs/vscode-sharepoint-poc-runbook.md`）
+4. ~~在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。~~（已併入 PoC 手冊 §3）
+
+剩餘任務 4 為 `[blocked]`，需到公司電腦或可連到 SharePoint Server 的環境執行實測，本機無法繼續推進。
 
 ## 明確執行清單
 
@@ -257,7 +259,7 @@ extension 不應做的事：
 | --- | --- | --- | --- | --- |
 | 1 | `[x]` | 建立 `scripts/` 模板 | `scripts/*.ps1` | 已完成六個 PowerShell 腳本模板，後續可直接被 `.vscode/tasks.json` 呼叫。 |
 | 2 | `[x]` | 建立 `.vscode/tasks.json` | `.vscode/tasks.json`、`.vscode/settings.json` | 已建立十個 VS Code tasks（六個規格 task 加上 `Build (Project)`、`Deploy WSP (All Web Apps)`、`Retract WSP (All Web Apps)`、`Retract WSP (All Web Apps + Remove from Farm)` 等變體）與 OmniSharp legacy 設定，全部透過 `${input:*}` 提示輸入，不硬編碼公司路徑。 |
-| 3 | `[ ]` | 補公司電腦 PoC 操作文件 | `docs/` 下新增 PoC 文件 | 需寫清楚公司電腦前置安裝、參數修改與第一次 PoC 執行順序。 |
+| 3 | `[x]` | 補公司電腦 PoC 操作文件 | `docs/vscode-sharepoint-poc-runbook.md` | 已撰寫 8 章節 PoC 手冊：必要工具、MSBuild 尋找、SharePoint PowerShell 載入、修改參數三種方式、第一次 PoC 執行順序、常見失敗點對照表、完成標準、本機限制。 |
 | 4 | `[blocked]` | 到公司電腦或 SharePoint Server 環境實測 | PoC 結果與修正紀錄 | 本機不執行 SharePoint 實測，需等公司環境具備 SharePoint PowerShell、MSBuild 與真實專案。 |
 
 ### 1. `[x]` 先建立 `scripts/` 模板
@@ -317,22 +319,27 @@ extension 不應做的事：
 - [x] deploy / update / retract task 在 `detail` 中明確標示 `[需公司電腦/SharePoint Server 環境]`。
 - [x] JSON 語法已用 PowerShell `ConvertFrom-Json` 驗證通過。
 
-### 3. `[ ]` 補一份公司電腦 PoC 操作文件
+### 3. `[x]` 已補公司電腦 PoC 操作文件
 
-待記錄內容：
+完成檔案：
 
-- [ ] 安裝或確認 SharePoint PowerShell / SharePoint Management Shell。
-- [ ] 確認 `MSBuild.exe`。
-- [ ] 確認 `.NET Framework Developer Pack`。
-- [ ] 修改腳本參數。
-- [ ] 用真實專案執行 build / package / deploy。
+- [x] `docs/vscode-sharepoint-poc-runbook.md`
+
+已記錄內容：
+
+- [x] §1 必要工具清單（VS Code、C# extension、.NET Framework Developer Pack、MSBuild、SharePoint Server、Windows PowerShell 5.1）。
+- [x] §2 確認 `MSBuild.exe`（vswhere 尋找、PATH 設定三種方式、SharePoint targets 驗證）。
+- [x] §3 安裝或啟用 SharePoint PowerShell / SharePoint Management Shell（snap-in、Module、權限、Execution Policy）。
+- [x] §4 修改腳本參數（task default、Command Palette 輸入、terminal 直呼三種方式）。
+- [x] §5 第一次 PoC 執行順序與 SharePoint 端確認項目。
+- [x] §6 常見失敗點與排查方向（MSBuild、reference assemblies、PowerShell、Deploy/Update/Retract 各類錯誤對照表）。
 
 完成標準：
 
-- [ ] 文件可讓公司電腦使用者按順序完成前置檢查。
-- [ ] 文件列出第一次 PoC 的建議命令。
-- [ ] 文件列出常見失敗點與排查方向。
-- [ ] 文件明確說明本機不做 SharePoint 實測。
+- [x] 文件可讓公司電腦使用者按順序完成前置檢查。
+- [x] 文件列出第一次 PoC 的建議命令（task 名稱與等同 PowerShell 指令並列）。
+- [x] 文件列出常見失敗點與排查方向（§6 對照表）。
+- [x] 文件明確說明本機不做 SharePoint 實測（§8 本機限制與不執行項目）。
 
 ### 4. `[blocked]` 等到公司電腦或 SharePoint Server 環境再實測
 
