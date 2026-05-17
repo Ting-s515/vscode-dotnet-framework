@@ -1,0 +1,317 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "SharePoint: Build",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/build.ps1",
+        "-SolutionPath",
+        "${input:solutionPath}",
+        "-Configuration",
+        "${input:configuration}",
+        "-Platform",
+        "${input:platform}"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "呼叫 scripts/build.ps1，使用 MSBuild 建置 solution。本機可執行，不需要 SharePoint 環境。"
+    },
+    {
+      "label": "SharePoint: Build (Project)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/build.ps1",
+        "-ProjectPath",
+        "${input:projectPath}",
+        "-Configuration",
+        "${input:configuration}",
+        "-Platform",
+        "${input:platform}"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "呼叫 scripts/build.ps1 以單一 .csproj 建置。當沒有 .sln 或只想建特定專案時使用。"
+    },
+    {
+      "label": "SharePoint: Package WSP",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/package.ps1",
+        "-ProjectPath",
+        "${input:projectPath}",
+        "-Configuration",
+        "${input:configuration}",
+        "-Platform",
+        "${input:platform}"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "呼叫 scripts/package.ps1，使用 MSBuild /t:Package 產生 .wsp。本機可執行，不需要 SharePoint 環境。"
+    },
+    {
+      "label": "SharePoint: Validate Package",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/validate-package.ps1",
+        "-ProjectPath",
+        "${input:projectPath}",
+        "-Configuration",
+        "${input:configuration}",
+        "-Platform",
+        "${input:platform}"
+      ],
+      "group": "test",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "呼叫 scripts/validate-package.ps1，使用 MSBuild /t:ValidatePackage 驗證 package。本機可執行，不需要 SharePoint 環境。"
+    },
+    {
+      "label": "SharePoint: Deploy WSP",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/deploy-wsp.ps1",
+        "-WspPath",
+        "${input:wspPath}",
+        "-WebApplicationUrl",
+        "${input:webApplicationUrl}"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 呼叫 scripts/deploy-wsp.ps1，使用 SharePoint PowerShell 新增並安裝 solution 到指定 Web Application。"
+    },
+    {
+      "label": "SharePoint: Deploy WSP (All Web Apps)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/deploy-wsp.ps1",
+        "-WspPath",
+        "${input:wspPath}",
+        "-AllWebApplications"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 部署到所有 Web Application（傳遞 -AllWebApplications，與 -WebApplicationUrl 互斥）。"
+    },
+    {
+      "label": "SharePoint: Update WSP",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/update-wsp.ps1",
+        "-WspPath",
+        "${input:wspPath}"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 呼叫 scripts/update-wsp.ps1，使用 SharePoint PowerShell 更新既有 solution。"
+    },
+    {
+      "label": "SharePoint: Retract WSP",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/retract-wsp.ps1",
+        "-SolutionName",
+        "${input:solutionName}",
+        "-WebApplicationUrl",
+        "${input:webApplicationUrl}"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 呼叫 scripts/retract-wsp.ps1，從指定 Web Application 解除安裝 SharePoint solution。"
+    },
+    {
+      "label": "SharePoint: Retract WSP (All Web Apps)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/retract-wsp.ps1",
+        "-SolutionName",
+        "${input:solutionName}",
+        "-AllWebApplications"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 從所有 Web Application 解除安裝 solution（傳遞 -AllWebApplications，與 -WebApplicationUrl 互斥）。"
+    },
+    {
+      "label": "SharePoint: Retract WSP (All Web Apps + Remove from Farm)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/retract-wsp.ps1",
+        "-SolutionName",
+        "${input:solutionName}",
+        "-AllWebApplications",
+        "-RemoveFromFarm"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "[需公司電腦/SharePoint Server 環境] 解除安裝後再從 Farm 移除 solution，等同 Uninstall + Remove。"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "solutionPath",
+      "type": "promptString",
+      "description": "輸入 .sln 路徑（相對於 workspace 或絕對路徑）",
+      "default": "${workspaceFolder}/YourSolution.sln"
+    },
+    {
+      "id": "projectPath",
+      "type": "promptString",
+      "description": "輸入 .csproj 路徑（相對於 workspace 或絕對路徑）",
+      "default": "${workspaceFolder}/YourProject/YourProject.csproj"
+    },
+    {
+      "id": "configuration",
+      "type": "pickString",
+      "description": "選擇 Build Configuration",
+      "options": [
+        "Debug",
+        "Release"
+      ],
+      "default": "Debug"
+    },
+    {
+      "id": "platform",
+      "type": "pickString",
+      "description": "選擇 Build Platform",
+      "options": [
+        "Any CPU",
+        "x86",
+        "x64"
+      ],
+      "default": "Any CPU"
+    },
+    {
+      "id": "wspPath",
+      "type": "promptString",
+      "description": "輸入 .wsp 檔案路徑（通常在 bin/Debug 或 bin/Release 下）",
+      "default": "${workspaceFolder}/bin/Debug/YourProject.wsp"
+    },
+    {
+      "id": "solutionName",
+      "type": "promptString",
+      "description": "輸入 SharePoint Solution 名稱（通常為 .wsp 檔名，例如 YourProject.wsp）",
+      "default": "YourProject.wsp"
+    },
+    {
+      "id": "webApplicationUrl",
+      "type": "promptString",
+      "description": "輸入 SharePoint Web Application URL",
+      "default": "http://sharepoint-server"
+    }
+  ]
+}

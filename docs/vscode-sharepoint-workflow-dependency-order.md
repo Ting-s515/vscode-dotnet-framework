@@ -238,8 +238,8 @@ extension 不應做的事：
 
 目前應先執行：
 
-1. 建立 scripts 模板。
-2. 建立 VS Code tasks 模板。
+1. ~~建立 scripts 模板。~~（已完成）
+2. ~~建立 VS Code tasks 模板。~~（已完成）
 3. 撰寫公司電腦 PoC 操作文件。
 4. 在操作文件中加入 SharePoint PowerShell / SharePoint Management Shell 安裝或啟用前置步驟。
 
@@ -256,7 +256,7 @@ extension 不應做的事：
 | 順序 | 狀態 | 任務 | 輸出 | 接手說明 |
 | --- | --- | --- | --- | --- |
 | 1 | `[x]` | 建立 `scripts/` 模板 | `scripts/*.ps1` | 已完成六個 PowerShell 腳本模板，後續可直接被 `.vscode/tasks.json` 呼叫。 |
-| 2 | `[ ]` | 建立 `.vscode/tasks.json` | `.vscode/tasks.json` | 下一步應建立 VS Code tasks，將每個 task 對應到既有 `scripts/*.ps1`。 |
+| 2 | `[x]` | 建立 `.vscode/tasks.json` | `.vscode/tasks.json`、`.vscode/settings.json` | 已建立十個 VS Code tasks（六個規格 task 加上 `Build (Project)`、`Deploy WSP (All Web Apps)`、`Retract WSP (All Web Apps)`、`Retract WSP (All Web Apps + Remove from Farm)` 等變體）與 OmniSharp legacy 設定，全部透過 `${input:*}` 提示輸入，不硬編碼公司路徑。 |
 | 3 | `[ ]` | 補公司電腦 PoC 操作文件 | `docs/` 下新增 PoC 文件 | 需寫清楚公司電腦前置安裝、參數修改與第一次 PoC 執行順序。 |
 | 4 | `[blocked]` | 到公司電腦或 SharePoint Server 環境實測 | PoC 結果與修正紀錄 | 本機不執行 SharePoint 實測，需等公司環境具備 SharePoint PowerShell、MSBuild 與真實專案。 |
 
@@ -284,23 +284,38 @@ extension 不應做的事：
 
 - `.vscode/tasks.json` 應直接呼叫這六個腳本，不應重新實作 build 或部署邏輯。
 
-### 2. `[ ]` 再建立 `.vscode/tasks.json`
+### 2. `[x]` 已建立 `.vscode/tasks.json`
 
-待建立 tasks：
+完成檔案：
 
-- [ ] `SharePoint: Build`
-- [ ] `SharePoint: Package WSP`
-- [ ] `SharePoint: Validate Package`
-- [ ] `SharePoint: Deploy WSP`
-- [ ] `SharePoint: Update WSP`
-- [ ] `SharePoint: Retract WSP`
+- [x] `.vscode/tasks.json`
+- [x] `.vscode/settings.json`（啟用 OmniSharp legacy、固定 PowerShell 為預設 terminal）
+
+已建立 tasks：
+
+規格要求的六個 task：
+
+- [x] `SharePoint: Build`（以 `-SolutionPath` 建置 solution，預設 build group）
+- [x] `SharePoint: Package WSP`
+- [x] `SharePoint: Validate Package`
+- [x] `SharePoint: Deploy WSP`（指定 `-WebApplicationUrl`）
+- [x] `SharePoint: Update WSP`
+- [x] `SharePoint: Retract WSP`（指定 `-WebApplicationUrl`）
+
+延伸 variant（為了暴露腳本中的互斥分支與常見變化，避免使用者手動改 task）：
+
+- [x] `SharePoint: Build (Project)`：當沒有 `.sln` 或只想建單一專案時使用 `-ProjectPath`。
+- [x] `SharePoint: Deploy WSP (All Web Apps)`：傳遞 `-AllWebApplications`，與 `-WebApplicationUrl` 互斥。
+- [x] `SharePoint: Retract WSP (All Web Apps)`：對所有 Web Application 解除安裝。
+- [x] `SharePoint: Retract WSP (All Web Apps + Remove from Farm)`：Uninstall + Remove 一次完成。
 
 完成標準：
 
-- [ ] 每個 task 都呼叫對應的 `scripts/*.ps1`。
-- [ ] task 參數使用 `${workspaceFolder}` 或可替換變數，不硬編碼公司路徑。
-- [ ] build / package / validate task 可在本機檢查參數結構，但不要求本機具備 SharePoint。
-- [ ] deploy / update / retract task 明確標示需在公司電腦或 SharePoint 環境執行。
+- [x] 每個 task 都呼叫對應的 `scripts/*.ps1`。
+- [x] task 參數透過 `inputs` 提示輸入，使用 `${workspaceFolder}` 與 `${input:*}`，不硬編碼公司路徑。
+- [x] build / package / validate task 可在本機檢查參數結構，但不要求本機具備 SharePoint。
+- [x] deploy / update / retract task 在 `detail` 中明確標示 `[需公司電腦/SharePoint Server 環境]`。
+- [x] JSON 語法已用 PowerShell `ConvertFrom-Json` 驗證通過。
 
 ### 3. `[ ]` 補一份公司電腦 PoC 操作文件
 

@@ -1,0 +1,21 @@
+{
+  "dotnet.server.useOmnisharp": true,
+  "omnisharp.useModernNet": false,
+  "omnisharp.enableMsBuildLoadProjectsOnDemand": false,
+  "omnisharp.enableRoslynAnalyzers": true,
+  "files.associations": {
+    "*.csproj": "xml",
+    "*.targets": "xml",
+    "*.props": "xml",
+    "*.wsp": "binary",
+    "Elements.xml": "xml",
+    "Feature.xml": "xml",
+    "Package.xml": "xml"
+  },
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/.vs": true
+  },
+  "terminal.integrated.defaultProfile.windows": "Windows PowerShell"
+}
