@@ -39,10 +39,10 @@
 
 | # | 項目 | 確認 |
 |---|------|------|
-| 0.1 | 目標專案是 SharePoint Server / Farm Solution（會產生 `.wsp`），不是 SPFx（Node-based） | `[ ]` |
-| 0.2 | 專案不依賴 WinForms / WPF Designer 與 Razor 視覺化編輯 | `[ ]` |
-| 0.3 | 已閱讀 [`vscode-sharepoint-dotnet-framework-feasibility.md`](./vscode-sharepoint-dotnet-framework-feasibility.md) 「不建議承諾的範圍」一節 | `[ ]` |
-| 0.4 | 驗收期間，同一份程式碼不會同時被紫色 Visual Studio 部署，避免互相覆蓋 | `[ ]` |
+| 0.1 | 目標專案是 SharePoint Server / Farm Solution（會產生 `.wsp`），不是 SPFx（Node-based） | `[ x]` |
+| 0.2 | 專案不依賴 WinForms / WPF Designer 與 Razor 視覺化編輯 | `[x ]` |
+| 0.3 | 已閱讀 [`vscode-sharepoint-dotnet-framework-feasibility.md`](./vscode-sharepoint-dotnet-framework-feasibility.md) 「不建議承諾的範圍」一節 | `[x ]` |
+| 0.4 | 驗收期間，同一份程式碼不會同時被紫色 Visual Studio 部署，避免互相覆蓋 | `[x ]` |
 
 任何一項未確認，**請先停止**，與專案負責人對齊範圍。
 
@@ -54,12 +54,12 @@
 
 | # | 驗證項目 | 執行步驟 | 預期結果 | 勾選 |
 |---|----------|----------|----------|------|
-| A1 | VS Code 已安裝 | terminal 執行 `code --version` | 顯示版本號 | `[ ]` |
-| A2 | `ms-dotnettools.csharp` 已安裝 | VS Code Extensions 搜尋 `C#`，確認發佈者為 Microsoft | 顯示 Installed | `[ ]` |
-| A3 | C# Dev Kit 未接管 | Extensions 確認 C# Dev Kit 未安裝，或已在本 workspace `Disable (Workspace)` | 不在 Enabled 清單 | `[ ]` |
-| A4 | 本 repo workspace 可開啟 | `code C:\side_project\framework-alternative` | 左側 Explorer 看到 `scripts/`、`docs/`、`.vscode/` | `[ ]` |
-| A5 | Windows PowerShell 5.1 可用 | `powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"` | Major=5、Minor=1 | `[ ]` |
-| A6 | 六個 PowerShell 腳本語法正確 | 在 repo 根目錄執行 `Get-ChildItem .\scripts\*.ps1 \| ForEach-Object { $null = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null); "$($_.Name) OK" }` | 六行 `*.ps1 OK` | `[ ]` |
+| A1 | VS Code 已安裝 | terminal 執行 `code --version` | 顯示版本號 | `[x ]` |
+| A2 | `ms-dotnettools.csharp` 已安裝 | VS Code Extensions 搜尋 `C#`，確認發佈者為 Microsoft | 顯示 Installed | `[x ]` |
+| A3 | C# Dev Kit 未接管 | Extensions 確認 C# Dev Kit 未安裝，或已在本 workspace `Disable (Workspace)` | 不在 Enabled 清單 | `[x ]` |
+| A4 | 本 repo workspace 可開啟 | `code C:\side_project\framework-alternative` | 左側 Explorer 看到 `scripts/`、`docs/`、`.vscode/` | `[x ]` |
+| A5 | Windows PowerShell 5.1 可用 | `powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"` | Major=5、Minor=1 | `[x ]` |
+| A6 | 六個 PowerShell 腳本語法正確 | 在 repo 根目錄執行 `foreach ($f in Get-ChildItem .\scripts\*.ps1) { $null = [System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$null); "$($f.Name) OK" }` | 六行 `*.ps1 OK` | `[ ]` |
 | A7 | VS Code Tasks 可被列出 | `Ctrl+Shift+P` → `Tasks: Run Task` | 看到 10 個 `SharePoint: *` task | `[ ]` |
 | A8 | `.vscode/settings.json` 已啟用 OmniSharp legacy | 開啟 `.vscode/settings.json` | `dotnet.server.useOmnisharp: true`、`omnisharp.useModernNet: false` | `[ ]` |
 
@@ -99,7 +99,7 @@
 | C3 | .NET Framework Developer Pack 版本符合專案 Target Framework | 控制台「程式和功能」確認 | 版本 ≥ 專案 TargetFrameworkVersion | `[ ]` |
 | C4 | SharePoint snap-in 或 Module 可載入 | Windows PowerShell 5.1 執行 `Add-PSSnapin Microsoft.SharePoint.PowerShell` 或 `Import-Module Microsoft.SharePoint.Powershell` | 無錯誤 | `[ ]` |
 | C5 | `Add-SPSolution` cmdlet 可用 | `Get-Command Add-SPSolution` | 回傳 cmdlet 資訊 | `[ ]` |
-| C6 | 執行帳號具部署權限 | `Get-SPShellAdmin \| Where-Object UserName -like "*$env:USERNAME*"` 或請 Farm Admin 確認 | 至少一筆結果 / Farm Admin 確認 | `[ ]` |
+| C6 | 執行帳號具部署權限 | 執行 `Get-SPShellAdmin` 後檢視輸出是否包含 `$env:USERNAME`；或請 Farm Admin 確認 | 列表中含目前使用者 / Farm Admin 確認 | `[ ]` |
 | C7 | PowerShell Execution Policy 不阻擋 | `Get-ExecutionPolicy -List` | 至少有一個 Scope 為 `RemoteSigned` / `Bypass` / `Unrestricted` | `[ ]` |
 | C8 | PowerShell LanguageMode 為 FullLanguage | `$ExecutionContext.SessionState.LanguageMode` | `FullLanguage` | `[ ]` |
 | C9 | 至少一個專案可成功被 `MSBuild.exe <project>.csproj /t:Build` 完成 | 命令列直接呼叫 MSBuild，不透過 task | exit code = 0 | `[ ]` |
