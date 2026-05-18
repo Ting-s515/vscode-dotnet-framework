@@ -1,11 +1,11 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param(
     [string]$SolutionPath,
     [string]$ProjectPath,
     [string]$Configuration = "Debug",
-    [string]$Platform = "Any CPU",
+    [string]$Platform = "AnyCPU",
     [string]$MsBuildPath = "msbuild.exe",
     [string[]]$AdditionalProperties = @(),
     [string[]]$AdditionalArguments = @()
@@ -22,7 +22,7 @@ function Resolve-ExecutablePath {
 
     if ([System.IO.Path]::IsPathRooted($Path)) {
         if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-            throw "找不到指定的 MSBuild.exe：$Path"
+            throw "找不到指定的 MSBuild.exe:$Path"
         }
 
         return (Resolve-Path -LiteralPath $Path).ProviderPath
@@ -30,7 +30,7 @@ function Resolve-ExecutablePath {
 
     $command = Get-Command -Name $Path -CommandType Application -ErrorAction SilentlyContinue
     if ($null -eq $command) {
-        throw "找不到 MSBuild.exe，請指定 -MsBuildPath 或先安裝 Visual Studio Build Tools。"
+        throw "找不到 MSBuild.exe,請指定 -MsBuildPath 或先安裝 Visual Studio Build Tools。"
     }
 
     return $command.Source
@@ -43,7 +43,7 @@ function Resolve-BuildTargetPath {
 
     if (-not [string]::IsNullOrWhiteSpace($SolutionPath)) {
         if (-not (Test-Path -LiteralPath $SolutionPath -PathType Leaf)) {
-            throw "找不到 solution：$SolutionPath"
+            throw "找不到 solution:$SolutionPath"
         }
 
         return (Resolve-Path -LiteralPath $SolutionPath).ProviderPath
@@ -51,7 +51,7 @@ function Resolve-BuildTargetPath {
 
     if (-not [string]::IsNullOrWhiteSpace($ProjectPath)) {
         if (-not (Test-Path -LiteralPath $ProjectPath -PathType Leaf)) {
-            throw "找不到 project：$ProjectPath"
+            throw "找不到 project:$ProjectPath"
         }
 
         return (Resolve-Path -LiteralPath $ProjectPath).ProviderPath
@@ -98,5 +98,5 @@ Write-Host "Target: $targetPath"
 
 & $resolvedMsBuild @arguments
 if ($LASTEXITCODE -ne 0) {
-    throw "MSBuild build 失敗，exit code：$LASTEXITCODE"
+    throw "MSBuild build 失敗,exit code:$LASTEXITCODE"
 }
