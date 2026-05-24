@@ -213,7 +213,61 @@ Get-Help .\scripts\build-docs-html.ps1 -Full
 <pre><code class="language-powershell"># 用預設瀏覽器開啟首頁（自動跳轉到 README.html）
 start .\docs\html\index.html
 </code></pre>
-<h2 id="3-troubleshoot-%E9%80%9F%E6%9F%A5" tabindex="-1">3. Troubleshoot 速查</h2>
+<h2 id="3-%E8%85%B3%E6%9C%AC%E5%9F%B7%E8%A1%8C%E6%B5%81%E7%A8%8B" tabindex="-1">3. 腳本執行流程</h2>
+<p>執行 <code>.\scripts\build-docs-html.ps1</code> 時，流程分成 PowerShell 入口檢查與 Node.js 轉換兩段：</p>
+<pre class="mermaid">flowchart TD
+    A[執行 scripts/build-docs-html.ps1]
+    B[確認 scripts/build-docs-html/ 存在]
+    C[確認 node.exe 可用]
+    D{是否指定 -SkipInstall&lt;br/&gt;或 node_modules 已存在}
+    E[在 scripts/build-docs-html/ 執行 npm install]
+    F[執行 node build.mjs]
+    G[讀取 docs/*.md 與 docs/*.mdx]
+    H[用 markdown-it 轉成 HTML&lt;br/&gt;並產生標題 anchor]
+    I[改寫內部 .md / .mdx 連結為 .html]
+    J[依 template.html 套用三欄式版面]
+    K[輸出 docs/html/*.html]
+    L[輸出 docs/html/index.html&lt;br/&gt;跳轉到 README.html]
+
+    A --&gt; B --&gt; C --&gt; D
+    D --&gt;|否| E --&gt; F
+    D --&gt;|是| F
+    F --&gt; G --&gt; H --&gt; I --&gt; J --&gt; K --&gt; L
+</pre>
+<p>各步驟的責任邊界：</p>
+<table>
+<thead>
+<tr>
+<th>步驟</th>
+<th>負責檔案</th>
+<th>做什麼</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PowerShell 入口</td>
+<td><code>scripts/build-docs-html.ps1</code></td>
+<td>檢查 Node.js、必要時安裝 npm 相依套件，然後呼叫 <code>build.mjs</code>。</td>
+</tr>
+<tr>
+<td>Markdown 轉換</td>
+<td><code>scripts/build-docs-html/build.mjs</code></td>
+<td>掃描 <code>docs/*.md</code> / <code>docs/*.mdx</code>，轉成 HTML，處理 Mermaid、標題 anchor、右側大綱與內部連結。</td>
+</tr>
+<tr>
+<td>HTML 版面</td>
+<td><code>scripts/build-docs-html/template.html</code></td>
+<td>定義三欄式頁面：左側文件目錄、中間正文、右側內容大綱。</td>
+</tr>
+<tr>
+<td>輸出結果</td>
+<td><code>docs/html/*.html</code></td>
+<td>每份文件輸出一個同名 HTML，<code>index.html</code> 只負責導向 README 頁。</td>
+</tr>
+</tbody>
+</table>
+<p><code>-SkipInstall</code> 只會跳過 npm 相依套件安裝檢查，不會跳過 Markdown 轉 HTML；只要文件有修改，仍會重新輸出全部 <code>docs/html/*.html</code>。</p>
+<h2 id="4-troubleshoot-%E9%80%9F%E6%9F%A5" tabindex="-1">4. Troubleshoot 速查</h2>
 <table>
 <thead>
 <tr>
@@ -255,7 +309,7 @@ start .\docs\html\index.html
 </tr>
 </tbody>
 </table>
-<h2 id="4-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B" tabindex="-1">4. 工具檔案結構</h2>
+<h2 id="5-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B" tabindex="-1">5. 工具檔案結構</h2>
 <pre><code class="language-text">scripts/
 ├── build-docs-html.ps1            # PowerShell 入口（使用者只接觸這個）
 └── build-docs-html/
@@ -268,7 +322,7 @@ start .\docs\html\index.html
 <p>要客製排版（顏色、字型、三欄寬度）→ 改 <code>template.html</code> 內的 <code>&lt;style&gt;</code>；要改文件篩選、右側大綱、連結改寫規則或 Mermaid 處理 → 改 <code>build.mjs</code>。</p>
 
         <div class="doc-footer">
-          原始檔：<code>docs/build-docs-html-guide.md</code> · 產生時間：2026-05-24 04:00:37 UTC
+          原始檔：<code>docs/build-docs-html-guide.md</code> · 產生時間：2026-05-24 04:09:33 UTC
         </div>
       </article>
     </main>
@@ -278,8 +332,9 @@ start .\docs\html\index.html
         <li class="level-1"><a href="#docs-md--docs-mdx-%E8%BD%89-html-%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8A">docs/*.md / docs/*.mdx 轉 HTML 操作手冊</a></li>
         <li class="level-2"><a href="#1-prerequisites">1. Prerequisites</a></li>
         <li class="level-2"><a href="#2-%E4%B8%89%E5%80%8B%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4">2. 三個常用指令</a></li>
-        <li class="level-2"><a href="#3-troubleshoot-%E9%80%9F%E6%9F%A5">3. Troubleshoot 速查</a></li>
-        <li class="level-2"><a href="#4-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B">4. 工具檔案結構</a></li>
+        <li class="level-2"><a href="#3-%E8%85%B3%E6%9C%AC%E5%9F%B7%E8%A1%8C%E6%B5%81%E7%A8%8B">3. 腳本執行流程</a></li>
+        <li class="level-2"><a href="#4-troubleshoot-%E9%80%9F%E6%9F%A5">4. Troubleshoot 速查</a></li>
+        <li class="level-2"><a href="#5-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B">5. 工具檔案結構</a></li>
       </ul>
     </aside>
   </div>

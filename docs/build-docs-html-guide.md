@@ -33,7 +33,43 @@ Get-Help .\scripts\build-docs-html.ps1 -Full
 start .\docs\html\index.html
 ```
 
-## 3. Troubleshoot 速查
+## 3. 腳本執行流程
+
+執行 `.\scripts\build-docs-html.ps1` 時，流程分成 PowerShell 入口檢查與 Node.js 轉換兩段：
+
+```mermaid
+flowchart TD
+    A[執行 scripts/build-docs-html.ps1]
+    B[確認 scripts/build-docs-html/ 存在]
+    C[確認 node.exe 可用]
+    D{是否指定 -SkipInstall<br/>或 node_modules 已存在}
+    E[在 scripts/build-docs-html/ 執行 npm install]
+    F[執行 node build.mjs]
+    G[讀取 docs/*.md 與 docs/*.mdx]
+    H[用 markdown-it 轉成 HTML<br/>並產生標題 anchor]
+    I[改寫內部 .md / .mdx 連結為 .html]
+    J[依 template.html 套用三欄式版面]
+    K[輸出 docs/html/*.html]
+    L[輸出 docs/html/index.html<br/>跳轉到 README.html]
+
+    A --> B --> C --> D
+    D -->|否| E --> F
+    D -->|是| F
+    F --> G --> H --> I --> J --> K --> L
+```
+
+各步驟的責任邊界：
+
+| 步驟 | 負責檔案 | 做什麼 |
+|------|----------|--------|
+| PowerShell 入口 | `scripts/build-docs-html.ps1` | 檢查 Node.js、必要時安裝 npm 相依套件，然後呼叫 `build.mjs`。 |
+| Markdown 轉換 | `scripts/build-docs-html/build.mjs` | 掃描 `docs/*.md` / `docs/*.mdx`，轉成 HTML，處理 Mermaid、標題 anchor、右側大綱與內部連結。 |
+| HTML 版面 | `scripts/build-docs-html/template.html` | 定義三欄式頁面：左側文件目錄、中間正文、右側內容大綱。 |
+| 輸出結果 | `docs/html/*.html` | 每份文件輸出一個同名 HTML，`index.html` 只負責導向 README 頁。 |
+
+`-SkipInstall` 只會跳過 npm 相依套件安裝檢查，不會跳過 Markdown 轉 HTML；只要文件有修改，仍會重新輸出全部 `docs/html/*.html`。
+
+## 4. Troubleshoot 速查
 
 | 症狀 | 原因 | 處理 |
 |------|------|------|
@@ -44,7 +80,7 @@ start .\docs\html\index.html
 | 右側內容大綱缺少項目 | 文件中沒有 `#` 到 `####` 標題 | 補上 Markdown 標題後重跑腳本 |
 | 內部連結點下去 404 | 對應 `.md` / `.mdx` 沒被一起 build（如手動寫的 `./xxx.html` 連到不存在檔案） | 確認原文件連結是 `./xxx.md` 或 `./xxx.mdx`，腳本會自動改寫為 `.html` |
 
-## 4. 工具檔案結構
+## 5. 工具檔案結構
 
 ```text
 scripts/
