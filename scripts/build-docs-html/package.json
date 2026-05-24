@@ -2,7 +2,7 @@
   "name": "build-docs-html",
   "version": "1.0.0",
   "private": true,
-  "description": "Convert docs/*.md to docs/html/*.html with Mermaid + GitHub styling",
+  "description": "Convert docs/*.md and docs/*.mdx to docs/html/*.html with Mermaid, navigation, and outlines",
   "type": "module",
   "scripts": {
     "build": "node build.mjs"

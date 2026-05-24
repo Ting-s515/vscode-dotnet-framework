@@ -1,6 +1,6 @@
-# `docs/*.md` 轉 HTML 操作手冊
+# `docs/*.md` / `docs/*.mdx` 轉 HTML 操作手冊
 
-把 `docs/` 下所有 `.md` 轉成 `docs/html/*.html`，方便用瀏覽器閱讀（側邊導覽、Mermaid 圖渲染、語法高亮）。
+把 `docs/` 下所有 `.md` / `.mdx` 轉成 `docs/html/*.html`，方便用瀏覽器閱讀。輸出頁面採三欄式閱讀版面：左側是文件目錄，中間是正文內容，右側是目前文件的大綱連結，並支援 Mermaid 圖渲染與語法高亮。
 
 ## 1. Prerequisites
 
@@ -19,7 +19,7 @@
 # (1) 第一次執行（會自動 npm install，約 5 秒）
 .\scripts\build-docs-html.ps1
 
-# (2) 之後改了 docs/*.md，重新產生（跳過 npm install，約 1 秒）
+# (2) 之後改了 docs/*.md 或 docs/*.mdx，重新產生（跳過 npm install，約 1 秒）
 .\scripts\build-docs-html.ps1 -SkipInstall
 
 # (3) 看完整參數說明
@@ -40,8 +40,9 @@ start .\docs\html\index.html
 | `找不到 node.exe` | 沒裝 Node.js | 安裝 Node.js LTS 後重開 PowerShell 再試 |
 | `npm install` 卡住或超時 | 公司 proxy / npm registry 被擋 | 改設 npm registry：`npm config set registry https://registry.npmmirror.com/` 後重跑 |
 | HTML 開啟後 Mermaid 沒渲染、字型很醜 | 公司網路擋 jsdelivr CDN | 暫時無解，需換成本地資源（後續可改 `scripts/build-docs-html/template.html`） |
-| 改了 `.md` 但 HTML 沒變 | 沒重跑腳本 | 執行 `.\scripts\build-docs-html.ps1 -SkipInstall` |
-| 內部連結點下去 404 | 對應 `.md` 沒被一起 build（如手動寫的 `./xxx.html` 連到不存在檔案） | 確認原 `.md` 的連結是 `./xxx.md`，腳本會自動改寫為 `.html` |
+| 改了 `.md` / `.mdx` 但 HTML 沒變 | 沒重跑腳本 | 執行 `.\scripts\build-docs-html.ps1 -SkipInstall` |
+| 右側內容大綱缺少項目 | 文件中沒有 `#` 到 `####` 標題 | 補上 Markdown 標題後重跑腳本 |
+| 內部連結點下去 404 | 對應 `.md` / `.mdx` 沒被一起 build（如手動寫的 `./xxx.html` 連到不存在檔案） | 確認原文件連結是 `./xxx.md` 或 `./xxx.mdx`，腳本會自動改寫為 `.html` |
 
 ## 4. 工具檔案結構
 
@@ -51,9 +52,9 @@ scripts/
 └── build-docs-html/
     ├── package.json               # npm 套件定義（markdown-it、markdown-it-anchor）
     ├── package-lock.json          # 鎖版本，commit 進 repo
-    ├── build.mjs                  # 實際的 Node 轉換邏輯
-    ├── template.html              # HTML 模板（改排版/CDN 來源就改這裡）
+    ├── build.mjs                  # 實際的 Node 轉換邏輯（目錄、大綱、連結改寫）
+    ├── template.html              # 三欄式 HTML 模板（改排版/CDN 來源就改這裡）
     └── node_modules/              # 自動安裝，.gitignore 已排除
 ```
 
-要客製排版（顏色、字型、側邊欄寬度）→ 改 `template.html` 內的 `<style>`；要改連結改寫規則或 Mermaid 處理 → 改 `build.mjs`。
+要客製排版（顏色、字型、三欄寬度）→ 改 `template.html` 內的 `<style>`；要改文件篩選、右側大綱、連結改寫規則或 Mermaid 處理 → 改 `build.mjs`。

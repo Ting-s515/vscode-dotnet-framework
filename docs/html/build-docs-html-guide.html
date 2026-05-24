@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>`docs/*.md` 轉 HTML 操作手冊</title>
+  <title>`docs/*.md` / `docs/*.mdx` 轉 HTML 操作手冊</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-light.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
   <style>
@@ -19,21 +19,29 @@
     }
     .layout {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      max-width: 1400px;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 900px) minmax(200px, 260px);
+      column-gap: 0;
+      max-width: 1640px;
       margin: 0 auto;
       min-height: 100vh;
     }
-    nav.sidebar {
+    nav.sidebar,
+    aside.outline {
       background: #fff;
-      border-right: 1px solid #d1d9e0;
       padding: 24px 16px;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow-y: auto;
     }
-    nav.sidebar h2 {
+    nav.sidebar {
+      border-right: 1px solid #d1d9e0;
+    }
+    aside.outline {
+      border-left: 1px solid #d1d9e0;
+    }
+    nav.sidebar h2,
+    aside.outline h2 {
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
@@ -42,15 +50,18 @@
       margin: 0 0 12px;
       padding: 0 10px;
     }
-    nav.sidebar ul {
+    nav.sidebar ul,
+    aside.outline ul {
       list-style: none;
       padding: 0;
       margin: 0 0 24px;
     }
-    nav.sidebar li {
+    nav.sidebar li,
+    aside.outline li {
       margin: 2px 0;
     }
-    nav.sidebar a {
+    nav.sidebar a,
+    aside.outline a {
       display: block;
       padding: 6px 10px;
       border-radius: 6px;
@@ -60,13 +71,39 @@
       line-height: 1.4;
       word-break: break-word;
     }
-    nav.sidebar a:hover {
+    aside.outline a {
+      color: #59636e;
+    }
+    nav.sidebar a:hover,
+    aside.outline a:hover {
       background: #eaeef2;
     }
     nav.sidebar li.active > a {
       background: #ddf4ff;
       color: #0969da;
       font-weight: 600;
+    }
+    aside.outline li.level-1 > a {
+      color: #1f2328;
+      font-weight: 600;
+    }
+    aside.outline li.level-2 > a {
+      padding-left: 18px;
+    }
+    aside.outline li.level-3 > a {
+      padding-left: 28px;
+      font-size: 12px;
+    }
+    aside.outline li.level-4 > a {
+      padding-left: 38px;
+      font-size: 12px;
+    }
+    aside.outline .empty-outline {
+      padding: 0 10px;
+      margin: 0;
+      color: #59636e;
+      font-size: 12px;
+      line-height: 1.5;
     }
     main {
       padding: 32px 48px;
@@ -90,7 +127,16 @@
     }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
-      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      nav.sidebar,
+      aside.outline {
+        position: static;
+        height: auto;
+        max-height: 240px;
+      }
+      aside.outline {
+        border-left: 0;
+        border-top: 1px solid #d1d9e0;
+      }
       main { padding: 16px; }
     }
     .doc-footer {
@@ -117,13 +163,13 @@
         <li><a href="vscode-sharepoint-workflow-dependency-order.html">vscode-sharepoint-workflow-dependency-order</a></li>
       </ul>
       <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
-        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code> 或 <code>docs/*.mdx</code>。
       </p>
     </nav>
     <main>
       <article class="markdown-body">
-        <h1 id="docs-md-%E8%BD%89-html-%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8A" tabindex="-1"><code>docs/*.md</code> 轉 HTML 操作手冊</h1>
-<p>把 <code>docs/</code> 下所有 <code>.md</code> 轉成 <code>docs/html/*.html</code>，方便用瀏覽器閱讀（側邊導覽、Mermaid 圖渲染、語法高亮）。</p>
+        <h1 id="docs-md--docs-mdx-%E8%BD%89-html-%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8A" tabindex="-1"><code>docs/*.md</code> / <code>docs/*.mdx</code> 轉 HTML 操作手冊</h1>
+<p>把 <code>docs/</code> 下所有 <code>.md</code> / <code>.mdx</code> 轉成 <code>docs/html/*.html</code>，方便用瀏覽器閱讀。輸出頁面採三欄式閱讀版面：左側是文件目錄，中間是正文內容，右側是目前文件的大綱連結，並支援 Mermaid 圖渲染與語法高亮。</p>
 <h2 id="1-prerequisites" tabindex="-1">1. Prerequisites</h2>
 <table>
 <thead>
@@ -157,7 +203,7 @@
 <pre><code class="language-powershell"># (1) 第一次執行（會自動 npm install，約 5 秒）
 .\scripts\build-docs-html.ps1
 
-# (2) 之後改了 docs/*.md，重新產生（跳過 npm install，約 1 秒）
+# (2) 之後改了 docs/*.md 或 docs/*.mdx，重新產生（跳過 npm install，約 1 秒）
 .\scripts\build-docs-html.ps1 -SkipInstall
 
 # (3) 看完整參數說明
@@ -193,14 +239,19 @@ start .\docs\html\index.html
 <td>暫時無解，需換成本地資源（後續可改 <code>scripts/build-docs-html/template.html</code>）</td>
 </tr>
 <tr>
-<td>改了 <code>.md</code> 但 HTML 沒變</td>
+<td>改了 <code>.md</code> / <code>.mdx</code> 但 HTML 沒變</td>
 <td>沒重跑腳本</td>
 <td>執行 <code>.\scripts\build-docs-html.ps1 -SkipInstall</code></td>
 </tr>
 <tr>
+<td>右側內容大綱缺少項目</td>
+<td>文件中沒有 <code>#</code> 到 <code>####</code> 標題</td>
+<td>補上 Markdown 標題後重跑腳本</td>
+</tr>
+<tr>
 <td>內部連結點下去 404</td>
-<td>對應 <code>.md</code> 沒被一起 build（如手動寫的 <code>./xxx.html</code> 連到不存在檔案）</td>
-<td>確認原 <code>.md</code> 的連結是 <code>./xxx.md</code>，腳本會自動改寫為 <code>.html</code></td>
+<td>對應 <code>.md</code> / <code>.mdx</code> 沒被一起 build（如手動寫的 <code>./xxx.html</code> 連到不存在檔案）</td>
+<td>確認原文件連結是 <code>./xxx.md</code> 或 <code>./xxx.mdx</code>，腳本會自動改寫為 <code>.html</code></td>
 </tr>
 </tbody>
 </table>
@@ -210,17 +261,27 @@ start .\docs\html\index.html
 └── build-docs-html/
     ├── package.json               # npm 套件定義（markdown-it、markdown-it-anchor）
     ├── package-lock.json          # 鎖版本，commit 進 repo
-    ├── build.mjs                  # 實際的 Node 轉換邏輯
-    ├── template.html              # HTML 模板（改排版/CDN 來源就改這裡）
+    ├── build.mjs                  # 實際的 Node 轉換邏輯（目錄、大綱、連結改寫）
+    ├── template.html              # 三欄式 HTML 模板（改排版/CDN 來源就改這裡）
     └── node_modules/              # 自動安裝，.gitignore 已排除
 </code></pre>
-<p>要客製排版（顏色、字型、側邊欄寬度）→ 改 <code>template.html</code> 內的 <code>&lt;style&gt;</code>；要改連結改寫規則或 Mermaid 處理 → 改 <code>build.mjs</code>。</p>
+<p>要客製排版（顏色、字型、三欄寬度）→ 改 <code>template.html</code> 內的 <code>&lt;style&gt;</code>；要改文件篩選、右側大綱、連結改寫規則或 Mermaid 處理 → 改 <code>build.mjs</code>。</p>
 
         <div class="doc-footer">
-          原始檔：<code>docs/build-docs-html-guide.md</code> · 產生時間：2026-05-17 09:54:02 UTC
+          原始檔：<code>docs/build-docs-html-guide.md</code> · 產生時間：2026-05-24 04:00:37 UTC
         </div>
       </article>
     </main>
+    <aside class="outline">
+      <h2>內容大綱</h2>
+      <ul>
+        <li class="level-1"><a href="#docs-md--docs-mdx-%E8%BD%89-html-%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8A">docs/*.md / docs/*.mdx 轉 HTML 操作手冊</a></li>
+        <li class="level-2"><a href="#1-prerequisites">1. Prerequisites</a></li>
+        <li class="level-2"><a href="#2-%E4%B8%89%E5%80%8B%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4">2. 三個常用指令</a></li>
+        <li class="level-2"><a href="#3-troubleshoot-%E9%80%9F%E6%9F%A5">3. Troubleshoot 速查</a></li>
+        <li class="level-2"><a href="#4-%E5%B7%A5%E5%85%B7%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B">4. 工具檔案結構</a></li>
+      </ul>
+    </aside>
   </div>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';

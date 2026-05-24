@@ -19,21 +19,29 @@
     }
     .layout {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      max-width: 1400px;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 900px) minmax(200px, 260px);
+      column-gap: 0;
+      max-width: 1640px;
       margin: 0 auto;
       min-height: 100vh;
     }
-    nav.sidebar {
+    nav.sidebar,
+    aside.outline {
       background: #fff;
-      border-right: 1px solid #d1d9e0;
       padding: 24px 16px;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow-y: auto;
     }
-    nav.sidebar h2 {
+    nav.sidebar {
+      border-right: 1px solid #d1d9e0;
+    }
+    aside.outline {
+      border-left: 1px solid #d1d9e0;
+    }
+    nav.sidebar h2,
+    aside.outline h2 {
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
@@ -42,15 +50,18 @@
       margin: 0 0 12px;
       padding: 0 10px;
     }
-    nav.sidebar ul {
+    nav.sidebar ul,
+    aside.outline ul {
       list-style: none;
       padding: 0;
       margin: 0 0 24px;
     }
-    nav.sidebar li {
+    nav.sidebar li,
+    aside.outline li {
       margin: 2px 0;
     }
-    nav.sidebar a {
+    nav.sidebar a,
+    aside.outline a {
       display: block;
       padding: 6px 10px;
       border-radius: 6px;
@@ -60,13 +71,39 @@
       line-height: 1.4;
       word-break: break-word;
     }
-    nav.sidebar a:hover {
+    aside.outline a {
+      color: #59636e;
+    }
+    nav.sidebar a:hover,
+    aside.outline a:hover {
       background: #eaeef2;
     }
     nav.sidebar li.active > a {
       background: #ddf4ff;
       color: #0969da;
       font-weight: 600;
+    }
+    aside.outline li.level-1 > a {
+      color: #1f2328;
+      font-weight: 600;
+    }
+    aside.outline li.level-2 > a {
+      padding-left: 18px;
+    }
+    aside.outline li.level-3 > a {
+      padding-left: 28px;
+      font-size: 12px;
+    }
+    aside.outline li.level-4 > a {
+      padding-left: 38px;
+      font-size: 12px;
+    }
+    aside.outline .empty-outline {
+      padding: 0 10px;
+      margin: 0;
+      color: #59636e;
+      font-size: 12px;
+      line-height: 1.5;
     }
     main {
       padding: 32px 48px;
@@ -90,7 +127,16 @@
     }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
-      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      nav.sidebar,
+      aside.outline {
+        position: static;
+        height: auto;
+        max-height: 240px;
+      }
+      aside.outline {
+        border-left: 0;
+        border-top: 1px solid #d1d9e0;
+      }
       main { padding: 16px; }
     }
     .doc-footer {
@@ -117,7 +163,7 @@
         <li class="active"><a href="#">vscode-sharepoint-workflow-dependency-order</a></li>
       </ul>
       <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
-        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code> 或 <code>docs/*.mdx</code>。
       </p>
     </nav>
     <main>
@@ -463,10 +509,36 @@
 </ol>
 
         <div class="doc-footer">
-          原始檔：<code>docs/vscode-sharepoint-workflow-dependency-order.md</code> · 產生時間：2026-05-17 09:54:02 UTC
+          原始檔：<code>docs/vscode-sharepoint-workflow-dependency-order.md</code> · 產生時間：2026-05-24 04:00:37 UTC
         </div>
       </article>
     </main>
+    <aside class="outline">
+      <h2>內容大綱</h2>
+      <ul>
+        <li class="level-1"><a href="#vs-code-sharepoint-%E5%B7%A5%E4%BD%9C%E6%B5%81%E4%BE%9D%E8%B3%B4%E6%AD%A5%E9%A9%9F%E9%A0%86%E5%BA%8F">VS Code SharePoint 工作流依賴步驟順序</a></li>
+        <li class="level-2"><a href="#%E7%9B%AE%E7%9A%84">目的</a></li>
+        <li class="level-2"><a href="#%E6%B1%BA%E7%AD%96%E5%89%8D%E6%8F%90">決策前提</a></li>
+        <li class="level-2"><a href="#%E4%BE%9D%E8%B3%B4%E9%A0%86%E5%BA%8F%E7%B8%BD%E8%A6%BD">依賴順序總覽</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-1%E7%A2%BA%E8%AA%8D%E7%9B%AE%E6%A8%99%E5%B7%A5%E4%BD%9C%E6%B5%81">步驟 1：確認目標工作流</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-2%E8%A8%AD%E8%A8%88%E5%8F%AF%E6%94%9C%E5%BC%8F%E5%8F%83%E6%95%B8">步驟 2：設計可攜式參數</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-3%E5%BB%BA%E7%AB%8B-scripts-%E6%A8%A1%E6%9D%BF">步驟 3：建立 scripts 模板</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-4%E5%BB%BA%E7%AB%8B-vs-code-tasks">步驟 4：建立 VS Code tasks</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-5%E6%92%B0%E5%AF%AB%E6%93%8D%E4%BD%9C%E6%96%87%E4%BB%B6">步驟 5：撰寫操作文件</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-6%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6%E5%9F%BA%E7%A4%8E%E7%92%B0%E5%A2%83%E8%A8%AD%E5%AE%9A">步驟 6：公司電腦基礎環境設定</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-7%E5%AE%89%E8%A3%9D%E6%88%96%E7%A2%BA%E8%AA%8D-sharepoint-powershell">步驟 7：安裝或確認 SharePoint PowerShell</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-8%E7%9C%9F%E5%AF%A6-sharepoint-%E5%B0%88%E6%A1%88-poc">步驟 8：真實 SharePoint 專案 PoC</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-9%E4%BF%AE%E6%AD%A3%E8%88%87%E6%A8%A1%E6%9D%BF%E5%8C%96">步驟 9：修正與模板化</a></li>
+        <li class="level-2"><a href="#%E6%AD%A5%E9%A9%9F-10%E8%A9%95%E4%BC%B0-vs-code-extension">步驟 10：評估 VS Code extension</a></li>
+        <li class="level-2"><a href="#%E7%9B%AE%E5%89%8D%E4%B8%8B%E4%B8%80%E6%AD%A5">目前下一步</a></li>
+        <li class="level-2"><a href="#%E6%98%8E%E7%A2%BA%E5%9F%B7%E8%A1%8C%E6%B8%85%E5%96%AE">明確執行清單</a></li>
+        <li class="level-3"><a href="#%E4%BA%A4%E6%8E%A5%E4%BB%BB%E5%8B%99%E8%A1%A8">交接任務表</a></li>
+        <li class="level-3"><a href="#1-x-%E5%85%88%E5%BB%BA%E7%AB%8B-scripts-%E6%A8%A1%E6%9D%BF">1. [x] 先建立 scripts/ 模板</a></li>
+        <li class="level-3"><a href="#2-x-%E5%B7%B2%E5%BB%BA%E7%AB%8B-vscodetasks-json">2. [x] 已建立 .vscode/tasks.json</a></li>
+        <li class="level-3"><a href="#3-x-%E5%B7%B2%E8%A3%9C%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6-poc-%E6%93%8D%E4%BD%9C%E6%96%87%E4%BB%B6">3. [x] 已補公司電腦 PoC 操作文件</a></li>
+        <li class="level-3"><a href="#4-blocked-%E7%AD%89%E5%88%B0%E5%85%AC%E5%8F%B8%E9%9B%BB%E8%85%A6%E6%88%96-sharepoint-server-%E7%92%B0%E5%A2%83%E5%86%8D%E5%AF%A6%E6%B8%AC">4. [blocked] 等到公司電腦或 SharePoint Server 環境再實測</a></li>
+      </ul>
+    </aside>
   </div>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';

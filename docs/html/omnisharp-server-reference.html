@@ -19,21 +19,29 @@
     }
     .layout {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      max-width: 1400px;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 900px) minmax(200px, 260px);
+      column-gap: 0;
+      max-width: 1640px;
       margin: 0 auto;
       min-height: 100vh;
     }
-    nav.sidebar {
+    nav.sidebar,
+    aside.outline {
       background: #fff;
-      border-right: 1px solid #d1d9e0;
       padding: 24px 16px;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow-y: auto;
     }
-    nav.sidebar h2 {
+    nav.sidebar {
+      border-right: 1px solid #d1d9e0;
+    }
+    aside.outline {
+      border-left: 1px solid #d1d9e0;
+    }
+    nav.sidebar h2,
+    aside.outline h2 {
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
@@ -42,15 +50,18 @@
       margin: 0 0 12px;
       padding: 0 10px;
     }
-    nav.sidebar ul {
+    nav.sidebar ul,
+    aside.outline ul {
       list-style: none;
       padding: 0;
       margin: 0 0 24px;
     }
-    nav.sidebar li {
+    nav.sidebar li,
+    aside.outline li {
       margin: 2px 0;
     }
-    nav.sidebar a {
+    nav.sidebar a,
+    aside.outline a {
       display: block;
       padding: 6px 10px;
       border-radius: 6px;
@@ -60,13 +71,39 @@
       line-height: 1.4;
       word-break: break-word;
     }
-    nav.sidebar a:hover {
+    aside.outline a {
+      color: #59636e;
+    }
+    nav.sidebar a:hover,
+    aside.outline a:hover {
       background: #eaeef2;
     }
     nav.sidebar li.active > a {
       background: #ddf4ff;
       color: #0969da;
       font-weight: 600;
+    }
+    aside.outline li.level-1 > a {
+      color: #1f2328;
+      font-weight: 600;
+    }
+    aside.outline li.level-2 > a {
+      padding-left: 18px;
+    }
+    aside.outline li.level-3 > a {
+      padding-left: 28px;
+      font-size: 12px;
+    }
+    aside.outline li.level-4 > a {
+      padding-left: 38px;
+      font-size: 12px;
+    }
+    aside.outline .empty-outline {
+      padding: 0 10px;
+      margin: 0;
+      color: #59636e;
+      font-size: 12px;
+      line-height: 1.5;
     }
     main {
       padding: 32px 48px;
@@ -90,7 +127,16 @@
     }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
-      nav.sidebar { position: static; height: auto; max-height: 240px; }
+      nav.sidebar,
+      aside.outline {
+        position: static;
+        height: auto;
+        max-height: 240px;
+      }
+      aside.outline {
+        border-left: 0;
+        border-top: 1px solid #d1d9e0;
+      }
       main { padding: 16px; }
     }
     .doc-footer {
@@ -117,7 +163,7 @@
         <li><a href="vscode-sharepoint-workflow-dependency-order.html">vscode-sharepoint-workflow-dependency-order</a></li>
       </ul>
       <p style="padding: 0 10px; font-size: 11px; color: #59636e; line-height: 1.5;">
-        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code>。
+        由 <code>scripts/build-docs-html.ps1</code> 自動產生，原始檔為 <code>docs/*.md</code> 或 <code>docs/*.mdx</code>。
       </p>
     </nav>
     <main>
@@ -822,10 +868,41 @@
 </ul>
 
         <div class="doc-footer">
-          原始檔：<code>docs/omnisharp-server-reference.md</code> · 產生時間：2026-05-17 09:54:02 UTC
+          原始檔：<code>docs/omnisharp-server-reference.md</code> · 產生時間：2026-05-24 04:00:37 UTC
         </div>
       </article>
     </main>
+    <aside class="outline">
+      <h2>內容大綱</h2>
+      <ul>
+        <li class="level-1"><a href="#omnisharp-server-%E5%8F%83%E8%80%83%E6%96%87%E4%BB%B6">OmniSharp Server 參考文件</a></li>
+        <li class="level-2"><a href="#0-%E6%96%87%E4%BB%B6%E7%9B%AE%E7%9A%84">0. 文件目的</a></li>
+        <li class="level-2"><a href="#1-omnisharp-%E6%98%AF%E4%BB%80%E9%BA%BC">1. OmniSharp 是什麼</a></li>
+        <li class="level-3"><a href="#1-1-omnisharp-%E6%8F%90%E4%BE%9B%E4%BB%80%E9%BA%BC%E8%83%BD%E5%8A%9B">1.1 OmniSharp 提供什麼能力</a></li>
+        <li class="level-3"><a href="#1-2-omnisharp-vs-c-dev-kit%E9%87%8D%E9%BB%9E">1.2 OmniSharp vs C# Dev Kit（重點）</a></li>
+        <li class="level-2"><a href="#2-%E5%AE%89%E8%A3%9D%E8%88%87%E5%95%9F%E7%94%A8%E6%B5%81%E7%A8%8B">2. 安裝與啟用流程</a></li>
+        <li class="level-3"><a href="#2-1-%E5%AE%89%E8%A3%9D%E6%AD%A5%E9%A9%9F">2.1 安裝步驟</a></li>
+        <li class="level-4"><a href="#2-1-1-%E7%B2%BE%E7%A2%BA%E5%A5%97%E4%BB%B6%E8%B3%87%E8%A8%8A%E5%85%88%E7%9C%8B%E6%B8%85%E6%A5%9A%E5%86%8D%E8%A3%9D">2.1.1 精確套件資訊（先看清楚再裝）</a></li>
+        <li class="level-4"><a href="#2-1-2-%E5%9B%9B%E7%A8%AE%E5%AE%89%E8%A3%9D%E6%96%B9%E5%BC%8F%E6%93%87%E4%B8%80">2.1.2 四種安裝方式（擇一）</a></li>
+        <li class="level-4"><a href="#2-1-3-%E5%90%8C%E5%90%8D%E5%A5%97%E4%BB%B6%E8%BE%A8%E8%AD%98%E8%A1%A8%E6%90%9C%E5%B0%8B-c-%E6%9C%83%E7%9C%8B%E5%88%B0%E7%9A%84%E6%89%80%E6%9C%89%E6%9D%B1%E8%A5%BF">2.1.3 同名套件辨識表（搜尋 C# 會看到的所有東西）</a></li>
+        <li class="level-4"><a href="#2-1-4-%E5%AE%89%E8%A3%9D%E5%BE%8C%E5%BF%85%E5%81%9A%E5%85%A9%E4%BB%B6%E4%BA%8B">2.1.4 安裝後必做兩件事</a></li>
+        <li class="level-3"><a href="#2-2-%E6%9C%AC%E5%B0%88%E6%A1%88%E4%BD%BF%E7%94%A8%E7%9A%84-settings-json">2.2 本專案使用的 settings.json</a></li>
+        <li class="level-2"><a href="#3-%E5%95%9F%E5%8B%95%E9%A9%97%E8%AD%89">3. 啟動驗證</a></li>
+        <li class="level-3"><a href="#3-1-%E6%80%8E%E9%BA%BC%E7%9F%A5%E9%81%93-omnisharp-%E5%B7%B2%E5%95%9F%E5%8B%95">3.1 怎麼知道 OmniSharp 已啟動？</a></li>
+        <li class="level-3"><a href="#3-2-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4command-palette-ctrlshiftp">3.2 常用指令（Command Palette Ctrl+Shift+P）</a></li>
+        <li class="level-2"><a href="#4-omnisharp-log-%E8%A7%A3%E8%AE%80">4. OmniSharp Log 解讀</a></li>
+        <li class="level-2"><a href="#5-%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8C%E8%88%87%E6%8E%92%E6%9F%A5">5. 常見問題與排查</a></li>
+        <li class="level-3"><a href="#5-1-intellisense-%E5%AE%8C%E5%85%A8%E6%B2%92%E5%8F%8D%E6%87%89b3-%E5%A4%B1%E6%95%97">5.1 IntelliSense 完全沒反應（B3 失敗）</a></li>
+        <li class="level-3"><a href="#5-2-intellisense-%E9%83%A8%E5%88%86%E6%AA%94%E6%A1%88%E6%9C%89%E9%83%A8%E5%88%86%E6%B2%92%E6%9C%89">5.2 IntelliSense 部分檔案有、部分沒有</a></li>
+        <li class="level-3"><a href="#5-3-%E8%B7%A8%E6%AA%94%E8%B7%B3%E8%BD%89-f12-%E8%B7%B3%E4%B8%8D%E5%88%B0">5.3 跨檔跳轉 F12 跳不到</a></li>
+        <li class="level-3"><a href="#5-4-omnisharp-%E4%B8%80%E7%9B%B4%E5%9C%A8-loading-">5.4 OmniSharp 一直在 Loading...</a></li>
+        <li class="level-3"><a href="#5-5-%E6%94%B9%E4%BA%86-settings-json-%E6%B2%92%E6%95%88%E6%9E%9C">5.5 改了 settings.json 沒效果</a></li>
+        <li class="level-2"><a href="#6-%E8%88%87%E5%85%B6%E4%BB%96%E5%85%83%E4%BB%B6%E7%9A%84%E9%97%9C%E4%BF%82">6. 與其他元件的關係</a></li>
+        <li class="level-2"><a href="#7-%E4%B8%8D%E5%9C%A8-omnisharp-%E7%AF%84%E5%9C%8D%E5%85%A7">7. 不在 OmniSharp 範圍內</a></li>
+        <li class="level-2"><a href="#8-%E8%88%87%E6%9C%AC%E5%B0%88%E6%A1%88%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8D%E6%87%89">8. 與本專案文件的對應</a></li>
+        <li class="level-2"><a href="#9-%E5%8F%83%E8%80%83%E9%80%A3%E7%B5%90">9. 參考連結</a></li>
+      </ul>
+    </aside>
   </div>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';

@@ -1,15 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    將 docs/*.md 全部轉成 docs/html/*.html，供使用者以瀏覽器閱讀。
+    將 docs/*.md 與 docs/*.mdx 全部轉成 docs/html/*.html，供使用者以瀏覽器閱讀。
 
 .DESCRIPTION
     呼叫 scripts/build-docs-html/build.mjs（Node.js + markdown-it）執行轉換：
     - 處理 GFM 表格、程式碼區塊
     - Mermaid 區塊用 CDN 渲染
     - github-markdown-css 排版
-    - 內部 .md 連結自動改寫為 .html
+    - 內部 .md / .mdx 連結自動改寫為 .html
     - 左側產生文件目錄導覽
+    - 右側依目前文件標題產生可點擊內容大綱
     - 額外輸出 docs/html/index.html 跳轉至 README.html
 
     第一次執行會自動 npm install 安裝相依套件至 scripts/build-docs-html/node_modules/。
@@ -59,7 +60,7 @@ if (-not $SkipInstall -and -not (Test-Path $nodeModules)) {
 }
 
 # 執行轉換
-Write-Host '[2/2] 轉換 docs/*.md -> docs/html/*.html ...' -ForegroundColor Cyan
+Write-Host '[2/2] 轉換 docs/*.md / docs/*.mdx -> docs/html/*.html ...' -ForegroundColor Cyan
 Push-Location $buildDir
 try {
     node build.mjs
